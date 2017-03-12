@@ -18,8 +18,8 @@ Gem::Specification.new do |s|
     documents.
   )
 
-  # s.add_runtime_dependency '...', '~> x.y.z'
-  s.add_development_dependency 'gemma', '~> 4.1.0'
+  s.add_runtime_dependency 'thor', '~> 0.19.4'
+  s.add_development_dependency 'gemma', '~> 5.0.0'
 
   s.files       = Dir.glob('{lib,bin}/**/*.rb') + %w(README.md)
   s.test_files  = Dir.glob('test/compare_compressors/*_test.rb')
