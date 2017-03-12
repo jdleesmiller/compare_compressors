@@ -6,6 +6,10 @@ require_relative 'compare_compressors/version'
 
 require_relative 'compare_compressors/result'
 require_relative 'compare_compressors/group_result'
+require_relative 'compare_compressors/grouper'
+require_relative 'compare_compressors/plotter'
+require_relative 'compare_compressors/command_line_interface'
+
 require_relative 'compare_compressors/compressor'
 require_relative 'compare_compressors/compressors/gzip_compressor'
 require_relative 'compare_compressors/compressors/brotli_compressor'

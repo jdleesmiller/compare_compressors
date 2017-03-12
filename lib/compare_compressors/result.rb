@@ -18,5 +18,25 @@ module CompareCompressors
     def group_key
       [compressor_name, compressor_level]
     end
+
+    def self.read_csv(io)
+      results = []
+      CSV(io, headers: true) do |csv|
+        csv.each do |row|
+          results << Result.from_row(row)
+        end
+      end
+      results
+    end
+
+    def self.from_row(row)
+      Result.new(
+        row['target'],
+        row['compressor_name'],
+        row['compressor_level'].to_i,
+        row['time'].to_f,
+        row['size'].to_i
+      )
+    end
   end
 end
