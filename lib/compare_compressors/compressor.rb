@@ -22,6 +22,10 @@ module CompareCompressors
       Result.new(target, name, level, time.total, size)
     end
 
+    def display_name
+      name
+    end
+
     def output_size(target)
       File.stat(output_name(target)).size
     end

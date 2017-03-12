@@ -109,10 +109,16 @@ module CompareCompressors
       group_results.map(&:compressor_name).uniq.sort
     end
 
+    def find_display_name(compressor_name)
+      compressor = COMPRESSORS.find { |c| c.name == compressor_name }
+      compressor&.display_name || compressor_name
+    end
+
     def points_splots
       compressor_names.map do |name|
         columns = using_columns(:mean_hours, :mean_compressed_gibytes, 0)
-        "'$#{name}' using #{columns} with points nocontour title '#{name}'"
+        "'$#{name}' using #{columns} with points nocontour" \
+        " title '#{find_display_name(name)}'"
       end
     end
 

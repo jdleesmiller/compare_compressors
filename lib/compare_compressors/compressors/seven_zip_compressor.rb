@@ -9,6 +9,10 @@ module CompareCompressors
       'seven_zip'
     end
 
+    def display_name
+      '7z'
+    end
+
     def extension
       '7z'
     end
