@@ -30,7 +30,7 @@ module CompareCompressors
         targets = group_results.map(&:target)
         uncompressed_sizes = targets.map { |target| File.stat(target).size }
         compression_ratios = group_results.zip(uncompressed_sizes).map do |r, u|
-          u / r.size
+          u / r.size.to_f
         end
         compression_deltas = group_results.zip(uncompressed_sizes).map do |r, u|
           u - r.size
@@ -39,18 +39,22 @@ module CompareCompressors
         n = group_results.size.to_f
         mean_hours = scale * group_results.map(&:time).sum / n / 3600.0
         mean_compressed_gibytes =
-          scale * group_results.map(&:size).sum / n / (1024**3)
+          scale * group_results.map(&:size).sum / n / 1024**3
         GroupResult.new(
           group_results.first.compressor_name,
           group_results.first.compressor_level,
           mean_hours,
           mean_compressed_gibytes,
-          scale * compression_deltas.sum / n,
+          scale * compression_deltas.sum / n / 1024**3,
           compression_ratios.inject(&:*)**(1 / n),
           mean_compressed_gibytes * gibyte_cost,
           mean_hours * hour_cost
         )
       end
+    end
+
+    def summarize(grouped_results, n = 5)
+      puts grouped_results.sort_by(&:total_cost).take(n)
     end
 
     def find_non_dominated(group_results)
