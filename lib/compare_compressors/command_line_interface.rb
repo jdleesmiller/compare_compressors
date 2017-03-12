@@ -65,6 +65,11 @@ module CompareCompressors
       desc: 'the output name for gnuplot',
       default: Plotter::DEFAULT_OUTPUT
     option \
+      :pareto_only,
+      desc: 'plot only non-dominated compressor-level pairs',
+      type: :boolean,
+      default: true
+    option \
       :logscale_y,
       desc: 'use a log10 scale for the size (lucky you if you need this)',
       type: :boolean,
@@ -89,7 +94,9 @@ module CompareCompressors
       results = read_results(csv_file)
       grouper = make_grouper(options)
       group_results = grouper.group(results)
-      group_results = grouper.find_non_dominated(group_results)
+      if options[:pareto_only]
+        group_results = grouper.find_non_dominated(group_results)
+      end
       plotter = Plotter.new(
         grouper,
         terminal: options[:terminal],
