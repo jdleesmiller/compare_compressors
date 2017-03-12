@@ -19,18 +19,25 @@ module CompareCompressors
       (0..11).to_a
     end
 
-    # The `bro` command does not seem to have anything that prints a version.
+    # The command does not seem to have anything that prints a version.
     def version
       '?'
     end
 
     def command(target, level)
       [
-        'bro',
+        command_name,
         '--input', target,
         '--output', output_name(target),
         '--quality', level.to_s
       ]
+    end
+
+    # The command is `bro` on mac with homebrew, but it's `brotli` when we
+    # install in ubuntu.
+    def command_name
+      return 'brotli' if `which brotli`.chomp != ''
+      'bro'
     end
   end
 end
