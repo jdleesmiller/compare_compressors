@@ -1,0 +1,10 @@
+.*.swp
+pkg/*
+*.gem
+.bundle
+/rcov
+/rdoc
+/yard
+/.yardoc
+/Gemfile.lock
+/data
