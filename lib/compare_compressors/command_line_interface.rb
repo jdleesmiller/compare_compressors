@@ -56,12 +56,49 @@ module CompareCompressors
       'plot [csv file]',
       'Read CSV from compare and write a gnuplot script'
     grouper_options
+    option \
+      :terminal,
+      desc: 'the terminal line for gnuplot',
+      default: Plotter::DEFAULT_TERMINAL
+    option \
+      :output,
+      desc: 'the output name for gnuplot',
+      default: Plotter::DEFAULT_OUTPUT
+    option \
+      :logscale_y,
+      desc: 'use a log10 scale for the size (lucky you if you need this)',
+      type: :boolean,
+      default: Plotter::DEFAULT_LOGSCALE_Y
+    option \
+      :autoscale_fix,
+      desc: 'zoom axes to fit the points tightly',
+      type: :boolean,
+      default: Plotter::DEFAULT_AUTOSCALE_FIX
+    option \
+      :show_labels,
+      desc: 'show compression level labels on the plot',
+      type: :boolean,
+      default: Plotter::DEFAULT_SHOW_LABELS
+    option \
+      :lmargin,
+      desc: 'adjust lmargin (workaround if y label is cut off on png)',
+      type: :numeric,
+      default: Plotter::DEFAULT_LMARGIN
+
     def plot(csv_file = nil)
       results = read_results(csv_file)
       grouper = make_grouper(options)
       group_results = grouper.group(results)
       group_results = grouper.find_non_dominated(group_results)
-      plotter = Plotter.new(grouper)
+      plotter = Plotter.new(
+        grouper,
+        terminal: options[:terminal],
+        output: options[:output],
+        logscale_y: options[:logscale_y],
+        autoscale_fix: options[:autoscale_fix],
+        show_labels: options[:show_labels],
+        lmargin: options[:lmargin]
+      )
       plotter.plot(group_results)
     end
 

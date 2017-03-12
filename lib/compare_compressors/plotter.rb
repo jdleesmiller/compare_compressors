@@ -9,21 +9,35 @@ module CompareCompressors
   # Plot compression results to gnuplot.
   #
   class Plotter
-    def initialize(grouper)
+    DEFAULT_TERMINAL = 'png size 640, 480'
+    DEFAULT_OUTPUT = 'compare_compressors.png'
+    DEFAULT_LOGSCALE_Y = false
+    DEFAULT_AUTOSCALE_FIX = false
+    DEFAULT_SHOW_LABELS = true
+    DEFAULT_LMARGIN = nil
+
+    def initialize(
+      grouper,
+      terminal:, output:, logscale_y:, autoscale_fix:, show_labels:, lmargin:
+    )
       @grouper = grouper
-      @terminal = 'png size 640, 480'
-      @output = 'compare_compressors.png'
-      @logscale_y = false
-      @autoscale_fix = false
+      @terminal = terminal
+      @output = output
+      @logscale_y = logscale_y
+      @autoscale_fix = autoscale_fix
+      @show_labels = show_labels
+      @lmargin = lmargin
 
       @io = nil
       @group_results = nil
     end
 
-    attr_accessor :terminal
-    attr_accessor :output
-    attr_accessor :logscale_y
-    attr_accessor :autoscale_fix
+    attr_reader :terminal
+    attr_reader :output
+    attr_reader :logscale_y
+    attr_reader :autoscale_fix
+    attr_reader :show_labels
+    attr_reader :lmargin
 
     attr_reader :grouper
     attr_reader :io
@@ -94,14 +108,12 @@ module CompareCompressors
       io.puts 'set xlabel "Compression Time (hours)"'
       io.puts 'set ylabel "Compressed Size (GiB)"'
       io.puts 'set key outside'
-
-      # Work around apparent bug in gnuplot (5.0.5): putting the key outside
-      # pushes the left margin off out of the canvas for the PNG terminal.
-      io.puts 'set lmargin 5' if terminal.start_with?('png')
+      io.puts "set lmargin #{lmargin}" if lmargin
     end
 
     def write_splot
-      splots = contour_splots + points_splots + point_label_splots
+      splots = contour_splots + points_splots
+      splots.concat(point_label_splots) if show_labels
       io.puts "splot #{splots.join(", \\\n  ")}"
     end
 
