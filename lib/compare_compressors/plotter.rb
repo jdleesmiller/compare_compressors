@@ -101,7 +101,7 @@ module CompareCompressors
     end
 
     def write_splot
-      splots = points_splots + point_label_splots + contour_splots
+      splots = contour_splots + points_splots + point_label_splots
       io.puts "splot #{splots.join(", \\\n  ")}"
     end
 
@@ -133,8 +133,8 @@ module CompareCompressors
 
     def contour_splots
       [
-        'cost(x, y) with labels boxed notitle nosurface',
-        'cost(x, y) with lines palette notitle nosurface'
+        'cost(x, y) with lines palette notitle nosurface',
+        'cost(x, y) with labels boxed notitle nosurface'
       ]
     end
 
