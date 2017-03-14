@@ -37,15 +37,15 @@ module CompareCompressors
         end
 
         n = group_results.size.to_f
-        mean_hours = scale * group_results.map(&:time).sum / n / 3600.0
+        mean_hours = scale * group_results.map(&:time).inject(&:+) / n / 3600.0
         mean_compressed_gibytes =
-          scale * group_results.map(&:size).sum / n / 1024**3
+          scale * group_results.map(&:size).inject(&:+) / n / 1024**3
         GroupResult.new(
           group_results.first.compressor_name,
           group_results.first.compressor_level,
           mean_hours,
           mean_compressed_gibytes,
-          scale * compression_deltas.sum / n / 1024**3,
+          scale * compression_deltas.inject(&:+) / n / 1024**3,
           compression_ratios.inject(&:*)**(1 / n),
           mean_compressed_gibytes * gibyte_cost,
           mean_hours * hour_cost
