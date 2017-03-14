@@ -54,7 +54,7 @@ module CompareCompressors
     end
 
     def summarize(grouped_results, n = 5)
-      puts grouped_results.sort_by(&:total_cost).take(n)
+      grouped_results.sort_by(&:total_cost).take(n)
     end
 
     def find_non_dominated(group_results)

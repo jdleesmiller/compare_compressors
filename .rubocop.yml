@@ -6,3 +6,11 @@ AllCops:
 Style/Documentation:
   Exclude:
     - 'test/**/*'
+
+Metrics/AbcSize:
+  Exclude:
+    - 'test/**/*'
+
+Metrics/MethodLength:
+  Exclude:
+    - 'test/**/*'

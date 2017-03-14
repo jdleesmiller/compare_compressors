@@ -51,13 +51,9 @@ module CompareCompressors
       grouper.hour_cost
     end
 
-    def self.gnuplot_installed?
-      `which gnuplot`.chomp != ''
-    end
-
-    def plot(group_results)
-      @io = STDOUT
+    def plot(group_results, io: STDOUT)
       @group_results = group_results
+      @io = io
       write
     end
 

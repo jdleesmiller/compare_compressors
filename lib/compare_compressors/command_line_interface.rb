@@ -117,7 +117,7 @@ module CompareCompressors
       results = read_results(csv_file)
       grouper = make_grouper(options)
       group_results = grouper.group(results)
-      grouper.summarize(group_results)
+      puts grouper.summarize(group_results)
     end
 
     private
