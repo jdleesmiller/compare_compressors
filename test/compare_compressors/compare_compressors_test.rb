@@ -63,10 +63,10 @@ class TestCompareCompressors < MiniTest::Test
   def test_grouper_groups_over_targets
     with_fixed_test_targets(2, 10_000) do |targets|
       results = [
-        Result.new(targets[0], 'fooz', 1, 10.1, 5000),
-        Result.new(targets[0], 'fooz', 2, 20.2, 2500),
-        Result.new(targets[1], 'fooz', 1, 10.3, 4000),
-        Result.new(targets[1], 'fooz', 2, 20.4, 2000)
+        Result.new(targets[0], 'fooz', 1, 10.1, 1000, 5000),
+        Result.new(targets[0], 'fooz', 2, 20.2, 1001, 2500),
+        Result.new(targets[1], 'fooz', 1, 10.3, 1002, 4000),
+        Result.new(targets[1], 'fooz', 2, 20.4, 1003, 2000)
       ]
 
       grouper = Grouper.new(gibyte_cost: 0.023, hour_cost: 0.05, scale: 10_000)
@@ -77,6 +77,7 @@ class TestCompareCompressors < MiniTest::Test
       assert_in_delta \
         10_000 * (10.1 + 10.3) / 2 / 3600,
         group_results[0].mean_hours
+      assert_equal 1002, group_results[0].max_rss
       assert_in_delta \
         10_000 * (5000 + 4000) / 2.0 / 1024**3,
         group_results[0].mean_compressed_gibytes

@@ -34,6 +34,15 @@ gem install compare_compressors
 
 ## Development
 
+To run the tests inside the docker container:
+
+```
+docker run --rm -it --entrypoint='' \
+  --volume=compare_compressors_bundle:/home/app/compare_compressors/.bundle \
+  --volume=`pwd`:/home/app/compare_compressors \
+  compare_compressors bundle exec rake
+```
+
 TODO developer advice
 
 ## Related

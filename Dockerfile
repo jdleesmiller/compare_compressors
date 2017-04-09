@@ -8,7 +8,7 @@ FROM ubuntu:xenial-20170214
 
 RUN set -ex &&\
   apt-get update &&\
-  apt-get install --no-install-recommends -y ruby bundler \
+  apt-get install --no-install-recommends -y ruby bundler time \
     brotli bzip2 p7zip xz-utils zstd &&\
   rm -rf /var/lib/apt/lists/* &&\
   useradd --user-group --create-home --shell /bin/false app

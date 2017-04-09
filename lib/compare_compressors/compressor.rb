@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'benchmark'
 require 'fileutils'
 require 'tmpdir'
 
@@ -15,11 +14,11 @@ module CompareCompressors
     end
 
     def compress_level(target, level)
-      status, time, out, err = run(*command(target, level))
+      status, time, max_rss, out, err = run(*command(target, level))
       raise "compress: #{name} failed:\n#{out}\n#{err}" unless status.zero?
       size = output_size(target)
       remove_output target
-      Result.new(target, name, level, time.total, size)
+      Result.new(target, name, level, time, max_rss, size)
     end
 
     def display_name
@@ -40,22 +39,40 @@ module CompareCompressors
       nil # not a problem
     end
 
+    private
+
     def run(*command, **options)
       Dir.mktmpdir do |tmp|
         out_pathname = File.join(tmp, 'out')
         err_pathname = File.join(tmp, 'err')
         options[:out] = out_pathname
         options[:err] = err_pathname
-        time = Benchmark.measure do
-          Process.waitpid(Process.spawn(*command, **options))
-        end
+
+        # Note: this is not the shell builtin but rather /usr/bin/time; at least
+        # on Ubuntu, the latter reports both time and max RSS (memory usage)
+        # metrics, which is what we want here. Write the time output to a
+        # temporary file to avoid conflicting with the child's stderr output.
+        time_pathname = File.join(tmp, 'time')
+        timed_command = [
+          'time', '--format=%S %U %M', "--output=#{time_pathname}"
+        ] + command
+
+        Process.waitpid(Process.spawn(*timed_command, **options))
+
         return [
           $CHILD_STATUS.exitstatus,
-          time,
+          *parse_time(time_pathname),
           File.read(out_pathname),
           File.read(err_pathname)
         ]
       end
+    end
+
+    # Returns total (system plus user) CPU time in seconds, and maximum resident
+    # set size (memory usage) in Kilobytes, which I think means KiB.
+    def parse_time(time_pathname)
+      sys, user, max_rss = File.read(time_pathname).split
+      [sys.to_f + user.to_f, max_rss.to_i]
     end
   end
 end

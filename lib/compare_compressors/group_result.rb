@@ -12,6 +12,7 @@ module CompareCompressors
     :compressor_name,
     :compressor_level,
     :mean_hours,
+    :max_rss,
     :mean_compressed_gibytes,
     :mean_compression_delta_gibytes,
     :geomean_compression_ratio,
@@ -31,7 +32,8 @@ module CompareCompressors
       <<-STRING
 #{compressor_name} level #{compressor_level}:
   compression ratio: #{format('%.2f', geomean_compression_ratio)}
-  compute hours    : #{format('%.1f', mean_hours)}
+  compute CPU hours: #{format('%.1f', mean_hours)}
+  max RSS (KiB)    : #{format('%d', max_rss)}
   compressed GiB   : #{format('%.1f', mean_compressed_gibytes)}
   GiB saved        : #{format('%.1f', mean_compression_delta_gibytes)}
   ------------------
