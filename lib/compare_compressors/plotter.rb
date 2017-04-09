@@ -13,20 +13,25 @@ module CompareCompressors
     DEFAULT_OUTPUT = 'compare_compressors.png'
     DEFAULT_LOGSCALE_Y = false
     DEFAULT_AUTOSCALE_FIX = false
+    DEFAULT_SHOW_COST_CONTOURS = true
     DEFAULT_SHOW_LABELS = true
     DEFAULT_LMARGIN = nil
+    DEFAULT_TITLE = nil
 
     def initialize(
       grouper,
-      terminal:, output:, logscale_y:, autoscale_fix:, show_labels:, lmargin:
+      terminal:, output:, logscale_y:, autoscale_fix:, show_cost_contours:,
+      show_labels:, lmargin:, title:
     )
       @grouper = grouper
       @terminal = terminal
       @output = output
       @logscale_y = logscale_y
       @autoscale_fix = autoscale_fix
+      @show_cost_contours = show_cost_contours
       @show_labels = show_labels
       @lmargin = lmargin
+      @title = title
 
       @io = nil
       @group_results = nil
@@ -36,8 +41,10 @@ module CompareCompressors
     attr_reader :output
     attr_reader :logscale_y
     attr_reader :autoscale_fix
+    attr_reader :show_cost_contours
     attr_reader :show_labels
     attr_reader :lmargin
+    attr_reader :title
 
     attr_reader :grouper
     attr_reader :io
@@ -101,6 +108,7 @@ module CompareCompressors
     end
 
     def write_axes_style
+      io.puts "set title #{escape(title)}" if title
       io.puts 'set xlabel "Compression Time (hours)"'
       io.puts 'set ylabel "Compressed Size (GiB)"'
       io.puts 'set key outside'
@@ -108,7 +116,9 @@ module CompareCompressors
     end
 
     def write_splot
-      splots = contour_splots + points_splots
+      splots = []
+      splots += contour_splots if show_cost_contours
+      splots += points_splots
       splots.concat(point_label_splots) if show_labels
       io.puts "splot #{splots.join(", \\\n  ")}"
     end
@@ -144,6 +154,13 @@ module CompareCompressors
         'cost(x, y) with lines palette notitle nosurface',
         'cost(x, y) with labels boxed notitle nosurface'
       ]
+    end
+
+    #
+    # Make at least some attempt to escape double quotes.
+    #
+    def escape(str)
+      str.dump
     end
 
     #

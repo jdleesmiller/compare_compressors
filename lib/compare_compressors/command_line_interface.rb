@@ -80,6 +80,11 @@ module CompareCompressors
       type: :boolean,
       default: Plotter::DEFAULT_AUTOSCALE_FIX
     option \
+      :show_cost_contours,
+      desc: 'show cost function contours',
+      type: :boolean,
+      default: Plotter::DEFAULT_SHOW_COST_CONTOURS
+    option \
       :show_labels,
       desc: 'show compression level labels on the plot',
       type: :boolean,
@@ -89,6 +94,11 @@ module CompareCompressors
       desc: 'adjust lmargin (workaround if y label is cut off on png)',
       type: :numeric,
       default: Plotter::DEFAULT_LMARGIN
+    option \
+      :title,
+      desc: 'main title (must not contain double quotes)',
+      type: :string,
+      default: Plotter::DEFAULT_TITLE
 
     def plot(csv_file = nil)
       results = read_results(csv_file)
@@ -103,8 +113,10 @@ module CompareCompressors
         output: options[:output],
         logscale_y: options[:logscale_y],
         autoscale_fix: options[:autoscale_fix],
+        show_cost_contours: options[:show_cost_contours],
         show_labels: options[:show_labels],
-        lmargin: options[:lmargin]
+        lmargin: options[:lmargin],
+        title: options[:title]
       )
       plotter.plot(group_results)
     end

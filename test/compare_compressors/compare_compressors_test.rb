@@ -42,7 +42,11 @@ class TestCompareCompressors < MiniTest::Test
         terminal: Plotter::DEFAULT_TERMINAL,
         output: Plotter::DEFAULT_OUTPUT,
         logscale_y: true,
-        autoscale_fix: true, show_labels: true, lmargin: 5
+        autoscale_fix: true,
+        show_cost_contours: true,
+        show_labels: true,
+        lmargin: 5,
+        title: 'Test Plot'
       )
 
       io = StringIO.new
