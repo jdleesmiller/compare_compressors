@@ -24,20 +24,22 @@ module CompareCompressors
       '?'
     end
 
-    def command(target, level)
+    def compression_command(target, level)
       [
-        command_name,
+        'brotli',
         '--input', target,
         '--output', output_name(target),
         '--quality', level.to_s
       ]
     end
 
-    # The command is `bro` on mac with homebrew, but it's `brotli` when we
-    # install in ubuntu.
-    def command_name
-      return 'brotli' if `which brotli`.chomp != ''
-      'bro'
+    def decompression_command(target)
+      [
+        'brotli',
+        '--decompress',
+        '--input', output_name(target),
+        '--output', target
+      ]
     end
   end
 end

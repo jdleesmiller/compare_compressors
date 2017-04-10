@@ -32,8 +32,12 @@ module CompareCompressors
       Regexp.last_match(1)
     end
 
-    def command(target, level)
+    def compression_command(target, level)
       ['7zr', 'a', "-mx=#{level}", output_name(target), target]
+    end
+
+    def decompression_command(target)
+      ['7zr', 'x', "-o#{File.dirname(target)}", output_name(target)]
     end
   end
 end

@@ -15,14 +15,19 @@ module CompareCompressors
     # Default to # on-demand cost for an Amazon EC2 m1.medium ($).
     DEFAULT_HOUR_COST = 0.047
 
-    def initialize(gibyte_cost:, hour_cost:, scale:)
+    # Default to single decompression per compression
+    DEFAULT_DECOMPRESSION_COUNT = 1
+
+    def initialize(gibyte_cost:, hour_cost:, decompression_count:, scale:)
       @gibyte_cost = gibyte_cost.to_f
       @hour_cost = hour_cost.to_f
+      @decompression_count = decompression_count.to_f
       @scale = scale.to_f
     end
 
     attr_reader :gibyte_cost
     attr_reader :hour_cost
+    attr_reader :decompression_count
     attr_reader :scale
 
     def group(results)
@@ -37,20 +42,34 @@ module CompareCompressors
         end
 
         n = group_results.size.to_f
-        mean_hours = scale * group_results.map(&:time).inject(&:+) / n / 3600.0
+        mean_compression_cpu_hours =
+          scale *
+          group_results.map(&:compression_cpu_time).inject(&:+) / n / 3600.0
+        max_compression_max_rss =
+          group_results.map(&:compression_max_rss).max
         mean_compressed_gibytes =
           scale * group_results.map(&:size).inject(&:+) / n / 1024**3
-        max_rss = group_results.map(&:max_rss).max
+        mean_decompression_cpu_hours =
+          scale * decompression_count *
+          group_results.map(&:decompression_cpu_time).inject(&:+) / n / 3600.0
+        max_decompression_max_rss =
+          group_results.map(&:decompression_max_rss).max
+        total_cpu_hours =
+          mean_compression_cpu_hours + mean_decompression_cpu_hours
         GroupResult.new(
           group_results.first.compressor_name,
           group_results.first.compressor_level,
-          mean_hours,
-          max_rss,
+          mean_compression_cpu_hours,
+          max_compression_max_rss,
           mean_compressed_gibytes,
           scale * compression_deltas.inject(&:+) / n / 1024**3,
           compression_ratios.inject(&:*)**(1 / n),
+          mean_decompression_cpu_hours,
+          max_decompression_max_rss,
+          total_cpu_hours,
           mean_compressed_gibytes * gibyte_cost,
-          mean_hours * hour_cost
+          mean_compression_cpu_hours * hour_cost,
+          mean_decompression_cpu_hours * hour_cost
         )
       end
     end

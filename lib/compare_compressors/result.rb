@@ -12,9 +12,11 @@ module CompareCompressors
     :target,
     :compressor_name,
     :compressor_level,
-    :time,
-    :max_rss,
-    :size
+    :compression_cpu_time,
+    :compression_max_rss,
+    :size,
+    :decompression_cpu_time,
+    :decompression_max_rss
   ) do
     def group_key
       [compressor_name, compressor_level]
@@ -35,9 +37,11 @@ module CompareCompressors
         row['target'],
         row['compressor_name'],
         row['compressor_level'].to_i,
-        row['time'].to_f,
-        row['max_rss'].to_i,
-        row['size'].to_i
+        row['compression_cpu_time'].to_f,
+        row['compression_max_rss'].to_i,
+        row['size'].to_i,
+        row['decompression_cpu_time'].to_f,
+        row['decompression_max_rss'].to_i
       )
     end
   end

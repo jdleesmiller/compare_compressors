@@ -14,11 +14,9 @@ TODO (code sample of usage)
 
 With docker:
 ```
-docker run --rm --volume \
-  /Users/john/compare_compressors/data:/home/app/compare_compressors/data \
+docker run --rm --volume `pwd`/data:/home/app/compare_compressors/data \
   compare_compressors compare data/test* >data/compare.csv
-docker run --rm --volume \
-  /Users/john/compare_compressors/data:/home/app/compare_compressors/data \
+docker run --rm --volume `pwd`/data:/home/app/compare_compressors/data \
   compare_compressors plot data/compare.csv | gnuplot
 ```
 

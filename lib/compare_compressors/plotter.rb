@@ -109,7 +109,7 @@ module CompareCompressors
 
     def write_axes_style
       io.puts "set title #{escape(title)}" if title
-      io.puts 'set xlabel "Compression Time (hours)"'
+      io.puts 'set xlabel "Compression + Decompression Time (CPU hours)"'
       io.puts 'set ylabel "Compressed Size (GiB)"'
       io.puts 'set key outside'
       io.puts "set lmargin #{lmargin}" if lmargin
@@ -134,7 +134,7 @@ module CompareCompressors
 
     def points_splots
       compressor_names.map do |name|
-        columns = using_columns(:mean_hours, :mean_compressed_gibytes, 0)
+        columns = using_columns(:total_cpu_hours, :mean_compressed_gibytes, 0)
         "'$#{name}' using #{columns} with points nocontour" \
         " title '#{find_display_name(name)}'"
       end
@@ -143,7 +143,7 @@ module CompareCompressors
     def point_label_splots
       compressor_names.map do |name|
         columns = using_columns(
-          :mean_hours, :mean_compressed_gibytes, 0, :compressor_level
+          :total_cpu_hours, :mean_compressed_gibytes, 0, :compressor_level
         )
         "'$#{name}' using #{columns} with labels nocontour notitle"
       end

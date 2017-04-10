@@ -24,7 +24,7 @@ module CompareCompressors
         csv << Result.members
         COMPRESSORS.each do |compressor|
           targets.each do |target|
-            compressor.compress(target).each do |result|
+            compressor.evaluate(target).each do |result|
               csv << result.to_a
             end
           end
@@ -44,6 +44,11 @@ module CompareCompressors
           type: :numeric,
           desc: 'compute cost per hour of CPU time for compression',
           default: Grouper::DEFAULT_HOUR_COST
+        option \
+          :decompression_count,
+          type: :numeric,
+          desc: 'number of decompressions per compression',
+          default: Grouper::DEFAULT_DECOMPRESSION_COUNT
         option \
           :scale,
           type: :numeric,
@@ -138,6 +143,7 @@ module CompareCompressors
       Grouper.new(
         gibyte_cost: options[:gibyte_cost],
         hour_cost: options[:hour_cost],
+        decompression_count: options[:decompression_count],
         scale: options[:scale]
       )
     end

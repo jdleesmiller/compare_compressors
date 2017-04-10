@@ -19,5 +19,13 @@ module CompareCompressors
         version_line =~ /Version (.+)\.\z/
       Regexp.last_match(1)
     end
+
+    def compression_command(target, level)
+      ['bzip2', "-#{level}", target]
+    end
+
+    def decompression_command(target)
+      ['bunzip2', output_name(target)]
+    end
   end
 end

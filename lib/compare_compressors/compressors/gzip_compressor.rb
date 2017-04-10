@@ -25,8 +25,12 @@ module CompareCompressors
       err.lines.first.chomp
     end
 
-    def command(target, level)
-      [name, '--keep', "-#{level}", target]
+    def compression_command(target, level)
+      ['gzip', "-#{level}", target]
+    end
+
+    def decompression_command(target)
+      ['gunzip', output_name(target)]
     end
   end
 end

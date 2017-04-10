@@ -26,8 +26,12 @@ module CompareCompressors
       Regexp.last_match(1)
     end
 
-    def command(target, level)
-      [name, "-#{level}", target]
+    def compression_command(target, level)
+      ['zstd', "-#{level}", target]
+    end
+
+    def decompression_command(target)
+      ['unzstd', output_name(target)]
     end
   end
 end
