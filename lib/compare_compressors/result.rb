@@ -12,9 +12,11 @@ module CompareCompressors
     :target,
     :compressor_name,
     :compressor_level,
+    :compression_elapsed_time,
     :compression_cpu_time,
     :compression_max_rss,
     :size,
+    :decompression_elapsed_time,
     :decompression_cpu_time,
     :decompression_max_rss
   ) do
@@ -37,9 +39,11 @@ module CompareCompressors
         row['target'],
         row['compressor_name'],
         row['compressor_level'].to_i,
+        row['compression_elapsed_time'].to_f,
         row['compression_cpu_time'].to_f,
         row['compression_max_rss'].to_i,
         row['size'].to_i,
+        row['decompression_elapsed_time'].to_f,
         row['decompression_cpu_time'].to_f,
         row['decompression_max_rss'].to_i
       )

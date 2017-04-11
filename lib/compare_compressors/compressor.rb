@@ -17,20 +17,20 @@ module CompareCompressors
         target = File.join(tmp, 'target')
         FileUtils.cp target_pathname, target
 
-        status, compression_time, compression_max_rss, out, err = \
-          run(tmp, *compression_command(target, level))
-        raise "compress: #{name} failed:\n#{out}\n#{err}" unless status.zero?
+        compression_times = run_action(
+          'compress', tmp, compression_command(target, level)
+        )
 
         size = output_size(target)
         remove_if_exists(target)
 
-        status, decompression_time, decompression_max_rss, out, err = \
-          run(tmp, *decompression_command(target))
-        raise "decompress: #{name} failed:\n#{out}\n#{err}" unless status.zero?
+        decompression_times = run_action(
+          'decompress', tmp, decompression_command(target)
+        )
 
         Result.new(
-          target_pathname, name, level, compression_time, compression_max_rss,
-          size, decompression_time, decompression_max_rss
+          target_pathname, name, level,
+          *compression_times, size, *decompression_times
         )
       end
     end
@@ -49,7 +49,13 @@ module CompareCompressors
 
     private
 
-    def run(tmp, *command, **options)
+    def run_action(action, tmp, command)
+      status, times, out, err = run(tmp, command)
+      raise "#{action}: #{name} failed:\n#{out}\n#{err}" unless status.zero?
+      times
+    end
+
+    def run(tmp, command, **options)
       out_pathname = File.join(tmp, 'out')
       err_pathname = File.join(tmp, 'err')
       options[:out] = out_pathname
@@ -62,24 +68,25 @@ module CompareCompressors
       # temporary file to avoid conflicting with the child's stderr output.
       time_pathname = File.join(tmp, 'time')
       timed_command = [
-        'time', '--format=%S %U %M', "--output=#{time_pathname}"
+        'time', '--format=%e %S %U %M', "--output=#{time_pathname}"
       ] + command
 
       Process.waitpid(Process.spawn(*timed_command, **options))
 
       [
         $CHILD_STATUS.exitstatus,
-        *parse_time(time_pathname),
+        parse_time(time_pathname),
         File.read(out_pathname),
         File.read(err_pathname)
       ]
     end
 
-    # Returns total (system plus user) CPU time in seconds, and maximum resident
-    # set size (memory usage) in Kilobytes, which I think means KiB.
+    # Returns elapsed time in seconds, total (system plus user) CPU time in
+    # seconds, and maximum resident set size (memory usage) in Kilobytes, which
+    # I think means KiB.
     def parse_time(time_pathname)
-      sys, user, max_rss = File.read(time_pathname).split
-      [sys.to_f + user.to_f, max_rss.to_i]
+      elapsed, sys, user, max_rss = File.read(time_pathname).split
+      [elapsed.to_f, sys.to_f + user.to_f, max_rss.to_i]
     end
 
     def remove_if_exists(pathname)

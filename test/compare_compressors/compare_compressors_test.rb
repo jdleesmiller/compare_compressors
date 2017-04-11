@@ -17,10 +17,18 @@ class TestCompareCompressors < MiniTest::Test
   def test_grouper_groups_over_targets
     with_fixed_test_targets(2, 10_000) do |targets|
       results = [
-        Result.new(targets[0], 'fooz', 1, 10.1, 1000, 5000, 2.1, 2000),
-        Result.new(targets[0], 'fooz', 2, 20.2, 1001, 2500, 4.2, 2001),
-        Result.new(targets[1], 'fooz', 1, 10.3, 1002, 4000, 2.3, 2002),
-        Result.new(targets[1], 'fooz', 2, 20.4, 1003, 2000, 4.4, 2003)
+        Result.new(
+          targets[0], 'fooz', 1, 1.1, 10.1, 1000, 5000, 3.1, 2.1, 2000
+        ),
+        Result.new(
+          targets[0], 'fooz', 2, 2.2, 20.2, 1001, 2500, 6.2, 4.2, 2001
+        ),
+        Result.new(
+          targets[1], 'fooz', 1, 1.3, 10.3, 1002, 4000, 3.3, 2.3, 2002
+        ),
+        Result.new(
+          targets[1], 'fooz', 2, 2.4, 20.4, 1003, 2000, 6.4, 4.4, 2003
+        )
       ]
 
       grouper = Grouper.new(
