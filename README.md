@@ -64,7 +64,7 @@ gem install compare_compressors
 For development, you will probably want (1) override the default entrypoint and (2) mount the application root inside the container. To do this:
 
 ```
-docker run --rm --entrypoint='' \
+docker run --rm -it --entrypoint='' \
   --volume=compare_compressors_bundle:/home/app/compare_compressors/.bundle \
   --volume=`pwd`:/home/app/compare_compressors \
   compare_compressors bundle exec rake
