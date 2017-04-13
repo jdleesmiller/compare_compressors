@@ -8,31 +8,23 @@ module CompareCompressors
   # Base class for compressors.
   #
   class Compressor
-    def evaluate(target)
-      levels.map { |level| evaluate_level(target, level) }
-    end
+    def evaluate(tmp, target, target_pathname, level)
+      compression_times = run_action(
+        'compress', tmp, compression_command(target_pathname, level)
+      )
 
-    def evaluate_level(target_pathname, level)
-      Dir.mktmpdir do |tmp|
-        target = File.join(tmp, 'target')
-        FileUtils.cp target_pathname, target
+      size = output_size(target_pathname)
+      remove_if_exists(target_pathname)
 
-        compression_times = run_action(
-          'compress', tmp, compression_command(target, level)
-        )
+      decompression_times = run_action(
+        'decompress', tmp, decompression_command(target_pathname)
+      )
 
-        size = output_size(target)
-        remove_if_exists(target)
+      remove_if_exists(output_name(target_pathname))
 
-        decompression_times = run_action(
-          'decompress', tmp, decompression_command(target)
-        )
-
-        Result.new(
-          target_pathname, name, level,
-          *compression_times, size, *decompression_times
-        )
-      end
+      Result.new(
+        target, name, level, *compression_times, size, *decompression_times
+      )
     end
 
     def display_name

@@ -4,6 +4,7 @@ require 'English'
 
 require_relative 'compare_compressors/version'
 
+require_relative 'compare_compressors/comparer'
 require_relative 'compare_compressors/result'
 require_relative 'compare_compressors/group_result'
 require_relative 'compare_compressors/grouper'

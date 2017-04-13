@@ -21,14 +21,7 @@ module CompareCompressors
       'Run compression tools on targets and write a CSV'
     def compare(*targets)
       CSV do |csv|
-        csv << Result.members
-        COMPRESSORS.each do |compressor|
-          targets.each do |target|
-            compressor.evaluate(target).each do |result|
-              csv << result.to_a
-            end
-          end
-        end
+        Comparer.new.run(csv, COMPRESSORS, targets)
       end
     end
 

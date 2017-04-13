@@ -111,9 +111,15 @@ class TestCompareCompressors < MiniTest::Test
     num_levels = compressor.levels.size
 
     with_random_test_targets(3, 100) do |targets|
-      results = []
+      csv_string_io = StringIO.new
+      CSV(csv_string_io) do |csv|
+        Comparer.new.run(csv, [compressor], targets)
+      end
+
+      csv_string_io.rewind
+      results = Result.read_csv(csv_string_io)
       targets.each do |target|
-        target_results = compressor.evaluate(target)
+        target_results = results.select { |r| r.target == target }
         assert_equal num_levels, target_results.size
         assert_equal \
           target_results.map(&:compressor_level).min,
@@ -121,7 +127,6 @@ class TestCompareCompressors < MiniTest::Test
         refute target_results.first.compression_cpu_time.negative?
         assert target_results.first.size.positive?
         refute target_results.first.decompression_cpu_time.negative?
-        results.concat(target_results)
       end
 
       grouper = Grouper.new(
