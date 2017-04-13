@@ -2,8 +2,7 @@
 
 https://github.com/jdleesmiller/compare_compressors
 
-{<img src="https://secure.travis-ci.org/jdleesmiller/compare_compressors.png" alt="Build Status" />}[http://travis-ci.org/jdleesmiller/compare_compressors]
-
+[![Build Status](https://travis-ci.org/jdleesmiller/compare_compressors.svg?branch=master)](https://travis-ci.org/jdleesmiller/compare_compressors)
 
 ## Synopsis
 
