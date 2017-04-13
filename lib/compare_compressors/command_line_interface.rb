@@ -14,7 +14,7 @@ module CompareCompressors
     def version
       puts "compare_compressors-#{CompareCompressors::VERSION}"
       COMPRESSORS.each do |compressor|
-        puts format('%10s: %s', compressor.name, compressor.version)
+        puts format('%10s: %s', compressor.name, compressor.version || '?')
       end
     end
     map %w(--version -v) => :version

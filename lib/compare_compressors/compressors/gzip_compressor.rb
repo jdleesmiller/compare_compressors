@@ -18,7 +18,7 @@ module CompareCompressors
     end
 
     def version
-      status, out, _err = run_version_command(name, '--version')
+      status, _times, out, _err = run(name, '--version')
       return nil unless status.zero?
       out.lines.first.chomp
     end

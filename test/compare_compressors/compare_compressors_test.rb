@@ -16,7 +16,11 @@ class TestCompareCompressors < MiniTest::Test
 
   def test_compressor_versions
     COMPRESSORS.each do |compressor|
-      assert_match(/[0-9]|\?/, compressor.version)
+      if compressor.name == 'brotli'
+        assert_nil compressor.version
+      else
+        assert_match(/[0-9]/, compressor.version)
+      end
     end
   end
 

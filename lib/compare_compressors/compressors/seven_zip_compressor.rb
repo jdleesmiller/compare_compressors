@@ -24,7 +24,7 @@ module CompareCompressors
     end
 
     def version
-      status, out, _err = run_version_command('7zr', '--help')
+      status, _times, out, _err = run('7zr', '--help')
       return nil unless status.zero?
       version_line = out.strip.lines.first.chomp
       raise "bad version line #{version_line}" unless

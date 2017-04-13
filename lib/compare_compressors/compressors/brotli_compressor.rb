@@ -4,6 +4,9 @@ module CompareCompressors
   #
   # Compress with Brotli.
   #
+  # Note: At present, the command does not seem to have anything that prints a
+  # version, so we can't implement `version`.
+  #
   class BrotliCompressor < Compressor
     def name
       'brotli'
@@ -17,11 +20,6 @@ module CompareCompressors
     # https://github.com/google/brotli/blob/cdca91b6f59dd7632985667d2cd585ab68937b48/enc/quality.h
     def levels
       (0..11).to_a
-    end
-
-    # The command does not seem to have anything that prints a version.
-    def version
-      '?'
     end
 
     def compression_command(target, level)
