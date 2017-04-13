@@ -8,7 +8,7 @@ services:
   - docker
 
 before_install:
-  - docker build -t jdleesmiller/compare_compressors .
+  - docker build -t compare_compressors .
   - docker run --rm -it --entrypoint='' compare_compressors bundle exec rake
 
 script: echo The tests ran in docker.
