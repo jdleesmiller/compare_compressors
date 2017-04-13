@@ -4,13 +4,17 @@ module CompareCompressors
   #
   # Compress with bzip2.
   #
-  class Bzip2Compressor < GzipCompressor
+  class Bzip2Compressor < Compressor
     def name
       'bzip2'
     end
 
     def extension
       'bz2'
+    end
+
+    def levels
+      (1..9).to_a
     end
 
     def version

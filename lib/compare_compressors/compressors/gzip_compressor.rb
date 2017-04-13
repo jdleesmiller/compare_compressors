@@ -2,9 +2,7 @@
 
 module CompareCompressors
   #
-  # Compress with gzip. Many compression tools provide a gzip-compatible
-  # interface, so this is also used as a base class for several other
-  # compressors.
+  # Compress with gzip.
   #
   class GzipCompressor < Compressor
     def name
