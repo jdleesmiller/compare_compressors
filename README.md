@@ -2,6 +2,9 @@
 
 https://github.com/jdleesmiller/compare_compressors
 
+{<img src="https://secure.travis-ci.org/jdleesmiller/compare_compressors.png" alt="Build Status" />}[http://travis-ci.org/jdleesmiller/compare_compressors]
+
+
 ## Synopsis
 
 Evaluate different compression tools and their settings by running them on a sample of data.
