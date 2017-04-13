@@ -1,10 +1,14 @@
 sudo: required
 
+# Don't bother installing ruby outside of docker. The C language is hopefully
+# a fairly minimal thing to load.
+language: C
+
 services:
   - docker
 
 before_install:
   - docker build -t jdleesmiller/compare_compressors .
+  - docker run --rm -it --entrypoint='' compare_compressors bundle exec rake
 
-script:
-  - docker run --rm -it --entrypoint='' jdleesmiller/compare_compressors bundle exec rake
+script: echo The tests ran in docker.
