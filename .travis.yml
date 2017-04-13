@@ -5,4 +5,6 @@ services:
 
 before_install:
   - docker build -t jdleesmiller/compare_compressors .
+
+script:
   - docker run --rm --entrypoint='' jdleesmiller/compare_compressors bundle exec rake
