@@ -24,11 +24,11 @@ module CompareCompressors
     end
 
     def version
-      status, _time, out, _err = run('7z', '--help')
+      status, out, _err = run_version_command('7zr', '--help')
       return nil unless status.zero?
       version_line = out.strip.lines.first.chomp
       raise "bad version line #{version_line}" unless
-        version_line =~ /([0-9.]+) : Copyright/
+        version_line =~ /([0-9.]+)[\s:]+Copyright/
       Regexp.last_match(1)
     end
 

@@ -73,6 +73,13 @@ module CompareCompressors
       ]
     end
 
+    def run_version_command(*command)
+      Dir.mktmpdir do |tmp|
+        status, _times, out, err = run(tmp, command)
+        [status, out, err]
+      end
+    end
+
     # Returns elapsed time in seconds, total (system plus user) CPU time in
     # seconds, and maximum resident set size (memory usage) in Kilobytes, which
     # I think means KiB.

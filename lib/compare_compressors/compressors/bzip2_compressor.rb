@@ -14,7 +14,9 @@ module CompareCompressors
     end
 
     def version
-      version_line = super
+      status, _out, err = run_version_command(name, '--version')
+      return nil unless status.zero?
+      version_line = err.lines.first.chomp
       raise "bad #{name} version line: #{version_line.inspect}" unless
         version_line =~ /Version (.+)\.\z/
       Regexp.last_match(1)

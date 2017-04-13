@@ -18,11 +18,11 @@ module CompareCompressors
     end
 
     def version
-      status, _time, out, _err = run(name, '--version')
+      status, out, _err = run_version_command(name, '--version')
       return nil unless status.zero?
       version_line = out.lines.first.chomp
       raise "bad version line #{version_line}" unless
-        version_line =~ /([0-9.]+)$/
+        version_line =~ /([0-9.a-z]+)$/
       Regexp.last_match(1)
     end
 

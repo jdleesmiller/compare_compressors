@@ -14,6 +14,12 @@ class TestCompareCompressors < MiniTest::Test
     end
   end
 
+  def test_compressor_versions
+    COMPRESSORS.each do |compressor|
+      assert_match(/[0-9]|\?/, compressor.version)
+    end
+  end
+
   def test_grouper_groups_over_targets
     with_fixed_test_targets(2, 10_000) do |targets|
       results = [
