@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require 'benchmark'
-require 'fileutils'
-require 'tmpdir'
-
 module CompareCompressors
   #
   # Plot compression results to gnuplot.
@@ -11,52 +7,38 @@ module CompareCompressors
   class Plotter
     DEFAULT_TERMINAL = 'png size 640, 480'
     DEFAULT_OUTPUT = 'compare_compressors.png'
-    DEFAULT_LOGSCALE_Y = false
+    DEFAULT_LOGSCALE_SIZE = false
     DEFAULT_AUTOSCALE_FIX = false
-    DEFAULT_SHOW_COST_CONTOURS = true
     DEFAULT_SHOW_LABELS = true
     DEFAULT_LMARGIN = nil
     DEFAULT_TITLE = nil
 
     def initialize(
-      grouper,
-      terminal:, output:, logscale_y:, autoscale_fix:, show_cost_contours:,
+      terminal:, output:, logscale_size:, autoscale_fix:,
       show_labels:, lmargin:, title:
     )
-      @grouper = grouper
       @terminal = terminal
       @output = output
-      @logscale_y = logscale_y
+      @logscale_size = logscale_size
       @autoscale_fix = autoscale_fix
-      @show_cost_contours = show_cost_contours
       @show_labels = show_labels
       @lmargin = lmargin
       @title = title
 
-      @io = nil
       @group_results = nil
+      @io = nil
     end
 
     attr_reader :terminal
     attr_reader :output
-    attr_reader :logscale_y
+    attr_reader :logscale_size
     attr_reader :autoscale_fix
-    attr_reader :show_cost_contours
     attr_reader :show_labels
     attr_reader :lmargin
     attr_reader :title
 
-    attr_reader :grouper
-    attr_reader :io
     attr_reader :group_results
-
-    def gibyte_cost
-      grouper.gibyte_cost
-    end
-
-    def hour_cost
-      grouper.hour_cost
-    end
+    attr_reader :io
 
     def plot(group_results, io: STDOUT)
       @group_results = group_results
@@ -69,6 +51,7 @@ module CompareCompressors
     def write
       write_preamble
       write_data
+      write_labels
       write_style
       write_splot
     end
@@ -90,36 +73,23 @@ module CompareCompressors
     end
 
     def write_style
-      write_cost_contour_style
-      write_axes_style
+      io.puts "set title #{escape(title)}" if title
+      io.puts 'set key outside'
+      io.puts "set lmargin #{lmargin}" if lmargin
 
-      io.puts 'set logscale y' if logscale_y
+      io.puts 'set logscale y' if logscale_size
       io.puts 'set autoscale fix' if autoscale_fix
     end
 
-    def write_cost_contour_style
-      io.puts 'set view map'
-      io.puts 'set contour'
-      io.puts 'set palette gray'
-      io.puts 'set cntrlabel font ",8"'
-      io.puts 'set style textbox opaque noborder'
-      io.puts 'unset colorbox'
-      io.puts "cost(x, y) = #{hour_cost} * x + #{gibyte_cost} * y"
+    def write_labels
+      # Subclasses can label the axes.
     end
 
-    def write_axes_style
-      io.puts "set title #{escape(title)}" if title
-      io.puts 'set xlabel "Compression + Decompression Time (CPU hours)"'
-      io.puts 'set ylabel "Compressed Size (GiB)"'
-      io.puts 'set key outside'
-      io.puts "set lmargin #{lmargin}" if lmargin
+    def splots
+      []
     end
 
     def write_splot
-      splots = []
-      splots += contour_splots if show_cost_contours
-      splots += points_splots
-      splots.concat(point_label_splots) if show_labels
       io.puts "splot #{splots.join(", \\\n  ")}"
     end
 
@@ -132,45 +102,11 @@ module CompareCompressors
       compressor&.display_name || compressor_name
     end
 
-    def points_splots
-      compressor_names.map do |name|
-        columns = using_columns(:total_cpu_hours, :mean_compressed_gibytes, 0)
-        "'$#{name}' using #{columns} with points nocontour" \
-        " title '#{find_display_name(name)}'"
-      end
-    end
-
-    def point_label_splots
-      compressor_names.map do |name|
-        columns = using_columns(
-          :total_cpu_hours, :mean_compressed_gibytes, 0, :compressor_level
-        )
-        "'$#{name}' using #{columns} with labels nocontour notitle"
-      end
-    end
-
-    def contour_splots
-      [
-        'cost(x, y) with lines palette notitle nosurface',
-        'cost(x, y) with labels boxed notitle nosurface'
-      ]
-    end
-
     #
     # Make at least some attempt to escape double quotes.
     #
     def escape(str)
       str.dump
-    end
-
-    #
-    # Look up the column indexes for the given GroupResult columns.
-    #
-    def using_columns(*column_names)
-      indexes = column_names.map do |name|
-        name.is_a?(Numeric) ? name : GroupResult.members.index(name) + 1
-      end
-      indexes.join(':')
     end
   end
 end

@@ -26,28 +26,8 @@ class TestCompareCompressors < MiniTest::Test
 
   def test_grouper_groups_over_targets
     with_fixed_test_targets(2, 10_000) do |targets|
-      results = [
-        Result.new(
-          targets[0], 'fooz', 1, 1.1, 10.1, 1000, 5000, 3.1, 2.1, 2000
-        ),
-        Result.new(
-          targets[0], 'fooz', 2, 2.2, 20.2, 1001, 2500, 6.2, 4.2, 2001
-        ),
-        Result.new(
-          targets[1], 'fooz', 1, 1.3, 10.3, 1002, 4000, 3.3, 2.3, 2002
-        ),
-        Result.new(
-          targets[1], 'fooz', 2, 2.4, 20.4, 1003, 2000, 6.4, 4.4, 2003
-        )
-      ]
-
-      grouper = Grouper.new(
-        gibyte_cost: 0.023,
-        hour_cost: 0.05,
-        decompression_count: 2,
-        scale: 10_000
-      )
-      group_results = grouper.group(results)
+      results = make_test_results(targets)
+      group_results = GroupResult.group(results, scale: 10_000)
       assert_equal 2, group_results.size
       assert_equal 'fooz', group_results[0].compressor_name
       assert_equal 1, group_results[0].compressor_level
@@ -65,22 +45,34 @@ class TestCompareCompressors < MiniTest::Test
         Math.sqrt((10_000.0 / 5000) * (10_000.0 / 4000)),
         group_results[0].geomean_compression_ratio
       assert_in_delta \
-        10_000 * 2 * (2.1 + 2.3) / 2 / 3600,
+        10_000 * (2.1 + 2.3) / 2 / 3600,
         group_results[0].mean_decompression_cpu_hours
       assert_equal 2002, group_results[0].max_decompression_max_rss
+
+      cost_model = CostModel.new(
+        gibyte_cost: 0.023,
+        compression_hour_cost: 0.05,
+        decompression_hour_cost: 0.10
+      )
+      costed_group_results =
+        CostedGroupResult.from_group_results(cost_model, group_results)
+
+      assert_equal 2, costed_group_results.size
+      assert_equal 'fooz', costed_group_results[0].compressor_name
+      assert_equal 1, costed_group_results[0].compressor_level
       assert_in_delta \
         0.023 * group_results[0].mean_compressed_gibytes,
-        group_results[0].compressed_size_cost
+        costed_group_results[0].gibyte_cost
       assert_in_delta \
         0.05 * group_results[0].mean_compression_cpu_hours,
-        group_results[0].compression_time_cost
+        costed_group_results[0].compression_hour_cost
       assert_in_delta \
-        0.05 * group_results[0].mean_decompression_cpu_hours,
-        group_results[0].decompression_time_cost
+        0.10 * group_results[0].mean_decompression_cpu_hours,
+        costed_group_results[0].decompression_hour_cost
       assert_in_delta \
-        group_results[0].total_cpu_hours,
-        group_results[0].mean_compression_cpu_hours +
-        group_results[0].mean_decompression_cpu_hours
+        costed_group_results[0].total_cost,
+        costed_group_results[0].hour_cost +
+        costed_group_results[0].gibyte_cost
     end
   end
 
@@ -116,6 +108,24 @@ class TestCompareCompressors < MiniTest::Test
     end
   end
 
+  # Test results for grouping.
+  def make_test_results(targets)
+    [
+      Result.new(
+        targets[0], 'fooz', 1, 1.1, 10.1, 1000, 5000, 3.1, 2.1, 2000
+      ),
+      Result.new(
+        targets[0], 'fooz', 2, 2.2, 20.2, 1001, 2500, 6.2, 4.2, 2001
+      ),
+      Result.new(
+        targets[1], 'fooz', 1, 1.3, 10.3, 1002, 4000, 3.3, 2.3, 2002
+      ),
+      Result.new(
+        targets[1], 'fooz', 2, 2.4, 20.4, 1003, 2000, 6.4, 4.4, 2003
+      )
+    ]
+  end
+
   # An integration test for any compressor.
   def check_compressor(compressor)
     num_levels = compressor.levels.size
@@ -139,31 +149,48 @@ class TestCompareCompressors < MiniTest::Test
         refute target_results.first.decompression_cpu_time.negative?
       end
 
-      grouper = Grouper.new(
-        gibyte_cost: 0.023,
-        hour_cost: 0.05,
-        decompression_count: 2,
-        scale: 10
-      )
-
       # Average out the targets.
-      group_results = grouper.group(results)
+      group_results = GroupResult.group(results, scale: 10)
       assert_equal num_levels, group_results.size
 
       # There's not much we can reliably say about the pareto results, because
       # they depend on time. We can make sure it runs, however.
-      pareto_results = grouper.find_non_dominated(group_results)
+      pareto_results = GroupResult.find_non_dominated(group_results)
       assert pareto_results.size.positive?
 
-      # Summarise the results. Again there's not much we can reliably test here.
-      summary_results = grouper.summarize(group_results)
-      assert_equal 5, summary_results.size
-
-      plotter = Plotter.new(
-        grouper,
+      raw_plotter = RawPlotter.new(
         terminal: Plotter::DEFAULT_TERMINAL,
         output: Plotter::DEFAULT_OUTPUT,
-        logscale_y: true,
+        logscale_size: true,
+        autoscale_fix: true,
+        show_labels: true,
+        lmargin: 5,
+        title: 'Test Plot'
+      )
+      io = StringIO.new
+      raw_plotter.plot(group_results, io: io)
+      script = io.string
+      assert_match(/set terminal png/, script)
+      assert_match(/#{compressor.name} << EOD/, script)
+
+      cost_model = CostModel.new(
+        gibyte_cost: 0.023,
+        compression_hour_cost: 0.05,
+        decompression_hour_cost: 0.10
+      )
+
+      costed_group_results =
+        CostedGroupResult.from_group_results(cost_model, group_results)
+
+      # Summarise the results. Again there's not much we can reliably test here.
+      summary_results = cost_model.summarize(costed_group_results)
+      assert_equal 5, summary_results.size
+
+      plotter = CostPlotter.new(
+        cost_model,
+        terminal: Plotter::DEFAULT_TERMINAL,
+        output: Plotter::DEFAULT_OUTPUT,
+        logscale_size: true,
         autoscale_fix: true,
         show_cost_contours: true,
         show_labels: true,
@@ -172,7 +199,7 @@ class TestCompareCompressors < MiniTest::Test
       )
 
       io = StringIO.new
-      plotter.plot(group_results, io: io)
+      plotter.plot(costed_group_results, io: io)
       script = io.string
       assert_match(/set terminal png/, script)
       assert_match(/#{compressor.name} << EOD/, script)
