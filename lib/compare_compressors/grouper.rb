@@ -11,8 +11,8 @@ module CompareCompressors
     # Default to current Amazon S3 storage cost per GiB*month ($).
     DEFAULT_GIBYTE_COST = 0.023
 
-    # Default to # on-demand cost for an Amazon EC2 m1.medium ($).
-    DEFAULT_HOUR_COST = 0.047
+    # Default to on-demand cost for an Amazon EC2 m3.medium ($).
+    DEFAULT_HOUR_COST = 0.073
 
     # Default to single decompression per compression
     DEFAULT_DECOMPRESSION_COUNT = 1
