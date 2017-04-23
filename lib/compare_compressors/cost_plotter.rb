@@ -10,8 +10,12 @@ module CompareCompressors
 
     def initialize(cost_model, **options)
       @cost_model = cost_model
-      @show_cost_contours =
-        options.delete(:show_cost_contours) || DEFAULT_SHOW_COST_CONTOURS
+      @show_cost_contours = \
+        if options.key?(:show_cost_contours)
+          options.delete(:show_cost_contours)
+        else
+          DEFAULT_SHOW_COST_CONTOURS
+        end
       super(**options)
     end
 
