@@ -36,8 +36,8 @@ module CompareCompressors
 
     def splots
       splots = []
-      splots.concat(contour_splots) if show_cost_contours
       splots.concat(points_splots)
+      splots.concat(contour_splots) if show_cost_contours
       splots.concat(point_label_splots) if show_labels
       splots
     end
