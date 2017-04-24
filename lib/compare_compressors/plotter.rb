@@ -53,7 +53,7 @@ module CompareCompressors
       write_data
       write_labels
       write_style
-      write_splot
+      write_plots
     end
 
     def write_preamble
@@ -89,12 +89,21 @@ module CompareCompressors
       []
     end
 
-    def write_splot
+    def write_plots
       io.puts "splot #{splots.join(", \\\n  ")}"
     end
 
     def compressor_names
       group_results.map(&:compressor_name).uniq.sort
+    end
+
+    def compressor_number(compressor_name)
+      COMPRESSORS.index { |c| c.name == compressor_name } + 1
+    end
+
+    def point_style(name)
+      number = compressor_number(name)
+      "linecolor #{number} pointtype #{number}"
     end
 
     def find_display_name(compressor_name)

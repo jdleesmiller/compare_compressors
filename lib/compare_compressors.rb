@@ -13,6 +13,7 @@ require_relative 'compare_compressors/costed_group_result'
 require_relative 'compare_compressors/plotter'
 require_relative 'compare_compressors/plotters/cost_plotter'
 require_relative 'compare_compressors/plotters/raw_plotter'
+require_relative 'compare_compressors/plotters/size_plotter'
 
 require_relative 'compare_compressors/compressor'
 require_relative 'compare_compressors/compressors/brotli_compressor'

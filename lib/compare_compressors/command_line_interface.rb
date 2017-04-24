@@ -98,25 +98,40 @@ module CompareCompressors
     end
 
     desc \
-      'plot_raw [csv file]',
-      'Write a gnuplot script for a 3D plot with the CSV from compare'
+      'plot [csv file]',
+      'Write a gnuplot script for a basic 2D plot with the CSV from compare'
     scale_option
     plot_options
-    def plot_raw(csv_file = nil)
+    option \
+      :decompression,
+      desc: 'show decompression time instead of compression time',
+      type: :boolean,
+      default: SizePlotter::DEFAULT_DECOMPRESSION
+    def plot(csv_file = nil)
       results = read_results(csv_file)
       group_results = GroupResult.group(results, scale: options[:scale])
       if options[:pareto_only]
         group_results = GroupResult.find_non_dominated(group_results)
       end
-      plotter = RawPlotter.new(
-        terminal: options[:terminal],
-        output: options[:output],
-        logscale_size: options[:logscale_size],
-        autoscale_fix: options[:autoscale_fix],
-        show_labels: options[:show_labels],
-        lmargin: options[:lmargin],
-        title: options[:title]
+      plotter = make_plotter(
+        SizePlotter, options,
+        decompression: options[:decompression]
       )
+      plotter.plot(group_results)
+    end
+
+    desc \
+      'plot_3d [csv file]',
+      'Write a gnuplot script for a 3D plot with the CSV from compare'
+    scale_option
+    plot_options
+    def plot_3d(csv_file = nil)
+      results = read_results(csv_file)
+      group_results = GroupResult.group(results, scale: options[:scale])
+      if options[:pareto_only]
+        group_results = GroupResult.find_non_dominated(group_results)
+      end
+      plotter = make_plotter(RawPlotter, options)
       plotter.plot(group_results)
     end
 
@@ -141,15 +156,8 @@ module CompareCompressors
         costed_group_results =
           CostedGroupResult.find_non_dominated(costed_group_results)
       end
-      plotter = CostPlotter.new(
-        cost_model,
-        terminal: options[:terminal],
-        output: options[:output],
-        logscale_size: options[:logscale_size],
-        autoscale_fix: options[:autoscale_fix],
-        show_labels: options[:show_labels],
-        lmargin: options[:lmargin],
-        title: options[:title],
+      plotter = make_plotter(
+        CostPlotter, options, cost_model,
         show_cost_contours: options[:show_cost_contours]
       )
       plotter.plot(costed_group_results)
@@ -176,6 +184,20 @@ module CompareCompressors
         gibyte_cost: options[:gibyte_cost],
         compression_hour_cost: options[:compression_hour_cost],
         decompression_hour_cost: options[:decompression_hour_cost]
+      )
+    end
+
+    def make_plotter(klass, options, *args, **kwargs)
+      klass.new(
+        *args,
+        terminal: options[:terminal],
+        output: options[:output],
+        logscale_size: options[:logscale_size],
+        autoscale_fix: options[:autoscale_fix],
+        show_labels: options[:show_labels],
+        lmargin: options[:lmargin],
+        title: options[:title],
+        **kwargs
       )
     end
 
