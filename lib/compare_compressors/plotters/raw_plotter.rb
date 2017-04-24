@@ -42,6 +42,7 @@ module CompareCompressors
           :mean_decompression_cpu_hours
         ).join(':')
         "'$#{name}' using #{columns} with points" \
+        " #{point_style(name)}" \
         " title '#{find_display_name(name)}'"
       end
     end

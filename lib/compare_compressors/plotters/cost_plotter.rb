@@ -36,8 +36,8 @@ module CompareCompressors
 
     def splots
       splots = []
-      splots.concat(points_splots)
       splots.concat(contour_splots) if show_cost_contours
+      splots.concat(points_splots)
       splots.concat(point_label_splots) if show_labels
       splots
     end
@@ -46,6 +46,7 @@ module CompareCompressors
       compressor_names.map do |name|
         columns = CostedGroupResult.column_indexes(:hour_cost, :gibyte_cost, 0)
         "'$#{name}' using #{columns.join(':')} with points nocontour" \
+        " #{point_style(name)}" \
         " title '#{find_display_name(name)}'"
       end
     end
