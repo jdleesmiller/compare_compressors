@@ -28,9 +28,9 @@ module CompareCompressors
       io.puts 'set view map'
       io.puts 'set contour'
       io.puts 'set palette gray'
-      io.puts 'set cntrlabel font ",8"'
+      io.puts 'set cntrlabel font ",10"'
       io.puts 'set style textbox opaque noborder'
-      io.puts 'set cbrange [0:1]' # TODO: find max cost?
+      io.puts 'set cbrange [0:1]' # TODO: find min and max cost?
       io.puts 'unset colorbox'
     end
 
@@ -63,6 +63,8 @@ module CompareCompressors
     def point_label_splots
       compressor_names.map do |name|
         columns = column_numbers + [0] + column_numbers([:compressor_level])
+        "'$#{name}' using #{columns.join(':')} with labels" \
+        ' left nocontour notitle'
       end
     end
 
