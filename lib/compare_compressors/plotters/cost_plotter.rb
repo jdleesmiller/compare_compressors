@@ -34,6 +34,11 @@ module CompareCompressors
       io.puts 'unset colorbox'
     end
 
+    def write_labels
+      io.puts 'set xlabel "Time Cost ($)"'
+      io.puts 'set ylabel "Size Cost ($)"'
+    end
+
     def splots
       splots = []
       splots.concat(contour_splots) if show_cost_contours
