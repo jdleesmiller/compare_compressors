@@ -110,14 +110,11 @@ module CompareCompressors
     def plot(csv_file = nil)
       results = read_results(csv_file)
       group_results = GroupResult.group(results, scale: options[:scale])
-      if options[:pareto_only]
-        group_results = GroupResult.find_non_dominated(group_results)
-      end
       plotter = make_plotter(
         SizePlotter, options,
         decompression: options[:decompression]
       )
-      plotter.plot(group_results)
+      plotter.plot(group_results, pareto_only: options[:pareto_only])
     end
 
     desc \
@@ -128,11 +125,8 @@ module CompareCompressors
     def plot_3d(csv_file = nil)
       results = read_results(csv_file)
       group_results = GroupResult.group(results, scale: options[:scale])
-      if options[:pareto_only]
-        group_results = GroupResult.find_non_dominated(group_results)
-      end
       plotter = make_plotter(RawPlotter, options)
-      plotter.plot(group_results)
+      plotter.plot(group_results, pareto_only: options[:pareto_only])
     end
 
     desc \
@@ -152,15 +146,11 @@ module CompareCompressors
       cost_model = make_cost_model(options)
       costed_group_results =
         CostedGroupResult.from_group_results(cost_model, group_results)
-      if options[:pareto_only]
-        costed_group_results =
-          CostedGroupResult.find_non_dominated(costed_group_results)
-      end
       plotter = make_plotter(
         CostPlotter, options, cost_model,
         show_cost_contours: options[:show_cost_contours]
       )
-      plotter.plot(costed_group_results)
+      plotter.plot(costed_group_results, pareto_only: options[:pareto_only])
     end
 
     desc \

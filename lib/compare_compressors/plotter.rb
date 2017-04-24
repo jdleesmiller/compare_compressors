@@ -40,7 +40,8 @@ module CompareCompressors
     attr_reader :group_results
     attr_reader :io
 
-    def plot(group_results, io: STDOUT)
+    def plot(group_results, pareto_only:, io: STDOUT)
+      group_results = find_non_dominated(group_results) if pareto_only
       @group_results = group_results
       @io = io
       write
@@ -85,6 +86,10 @@ module CompareCompressors
       # Subclasses can label the axes.
     end
 
+    def column_names
+      # Subclasses can declare their column names.
+    end
+
     def splots
       []
     end
@@ -109,6 +114,33 @@ module CompareCompressors
     def find_display_name(compressor_name)
       compressor = COMPRESSORS.find { |c| c.name == compressor_name }
       compressor&.display_name || compressor_name
+    end
+
+    def column_numbers(names = column_names)
+      struct = @group_results.first.class
+      names.map { |name| struct.members.index(name) + 1 }
+    end
+
+    #
+    # Find points on the Pareto frontier using the axes shown in the graph.
+    #
+    # @param [Array.<Struct>] points
+    # @return [Array.<Struct>]
+    #
+    def find_non_dominated(points)
+      points.reject do |point0|
+        points.any? do |point1|
+          dominates?(point1, point0)
+        end
+      end
+    end
+
+    #
+    # Check whether `point1` dominates `point0`. Here we assume that we are
+    # minimizing on all columns.
+    #
+    def dominates?(point1, point0)
+      column_names.all? { |name| point1[name] < point0[name] }
     end
 
     #

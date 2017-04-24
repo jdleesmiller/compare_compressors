@@ -30,18 +30,21 @@ module CompareCompressors
       io.puts 'set zlabel "Decompression Time (CPU hours)" rotate parallel'
     end
 
+    def column_names
+      [
+        :mean_compression_cpu_hours,
+        :mean_compressed_gibytes,
+        :mean_decompression_cpu_hours
+      ]
+    end
+
     def splots
       points_splots
     end
 
     def points_splots
       compressor_names.map do |name|
-        columns = GroupResult.column_indexes(
-          :mean_compression_cpu_hours,
-          :mean_compressed_gibytes,
-          :mean_decompression_cpu_hours
-        ).join(':')
-        "'$#{name}' using #{columns} with points" \
+        "'$#{name}' using #{column_numbers.join(':')} with points" \
         " #{point_style(name)}" \
         " title '#{find_display_name(name)}'"
       end

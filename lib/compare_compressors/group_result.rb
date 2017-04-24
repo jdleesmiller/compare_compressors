@@ -54,43 +54,5 @@ module CompareCompressors
         )
       end
     end
-
-    #
-    # Find grouped results on the Pareto frontier of the given set of grouped
-    # results.
-    #
-    # @param [Array.<GroupResult>] group_results
-    # @return [Array.<GroupResult>]
-    #
-    def self.find_non_dominated(group_results)
-      group_results.reject do |group_result0|
-        group_results.any? do |group_result1|
-          group_result1.dominates?(group_result0)
-        end
-      end
-    end
-
-    #
-    # Dominates on all three criteria.
-    #
-    # @param [GroupResult] other
-    #
-    def dominates?(other)
-      mean_compression_cpu_hours < other.mean_compression_cpu_hours &&
-        mean_decompression_cpu_hours < other.mean_decompression_cpu_hours &&
-        mean_compressed_gibytes < other.mean_compressed_gibytes
-    end
-
-    #
-    # Look up the column indices for the given columns by name.
-    #
-    # @param [Array.<[Symbol, Integer]>]
-    # @return [Array.<Integer>]
-    #
-    def self.column_indexes(*column_names)
-      column_names.map do |name|
-        name.is_a?(Integer) ? name : GroupResult.members.index(name) + 1
-      end
-    end
   end
 end

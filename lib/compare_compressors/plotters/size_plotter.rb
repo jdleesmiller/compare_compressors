@@ -29,26 +29,39 @@ module CompareCompressors
       end
     end
 
+    def column_names
+      if decompression
+        [:mean_decompression_cpu_hours, :mean_compressed_gibytes]
+      else
+        [:mean_compression_cpu_hours, :mean_compressed_gibytes]
+      end
+    end
+
     def write_plots
       io.puts "plot #{plots.join(", \\\n  ")}"
     end
 
-    def x_column
-      if decompression
-        :mean_decompression_cpu_hours
+    def plots
+      if show_labels
+        point_plots + point_label_plots
       else
-        :mean_compression_cpu_hours
+        point_plots
       end
     end
 
-    def plots
+    def point_plots
       compressor_names.map do |name|
-        columns = GroupResult.column_indexes(
-          x_column, :mean_compressed_gibytes
-        ).join(':')
-        "'$#{name}' using #{columns} with points" \
+        "'$#{name}' using #{column_numbers.join(':')} with points" \
         " #{point_style(name)}" \
         " title '#{find_display_name(name)}'"
+      end
+    end
+
+    def point_label_plots
+      compressor_names.map do |name|
+        columns = column_numbers(column_names + [:compressor_level])
+        "'$#{name}' using #{columns.join(':')}" \
+        ' with labels left offset 0, character 0.5 notitle'
       end
     end
   end

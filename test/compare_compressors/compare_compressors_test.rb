@@ -153,11 +153,30 @@ class TestCompareCompressors < MiniTest::Test
       group_results = GroupResult.group(results, scale: 10)
       assert_equal num_levels, group_results.size
 
+      # Run the 2D plotter.
+      size_plotter = SizePlotter.new(
+        terminal: Plotter::DEFAULT_TERMINAL,
+        output: Plotter::DEFAULT_OUTPUT,
+        logscale_size: true,
+        autoscale_fix: true,
+        show_labels: true,
+        lmargin: 5,
+        title: 'Test Plot'
+      )
+      io = StringIO.new
+      size_plotter.plot(group_results, pareto_only: false, io: io)
+      script = io.string
+      assert_match(/set terminal png/, script)
+      assert_match(/#{compressor.name} << EOD/, script)
+
       # There's not much we can reliably say about the pareto results, because
       # they depend on time. We can make sure it runs, however.
-      pareto_results = GroupResult.find_non_dominated(group_results)
-      assert pareto_results.size.positive?
+      io = StringIO.new
+      size_plotter.plot(group_results, pareto_only: true, io: io)
+      assert_match(/#{compressor.name} << EOD/, io.string)
+      assert size_plotter.group_results.size.positive?
 
+      # Run the 3D plotter.
       raw_plotter = RawPlotter.new(
         terminal: Plotter::DEFAULT_TERMINAL,
         output: Plotter::DEFAULT_OUTPUT,
@@ -168,11 +187,18 @@ class TestCompareCompressors < MiniTest::Test
         title: 'Test Plot'
       )
       io = StringIO.new
-      raw_plotter.plot(group_results, io: io)
+      raw_plotter.plot(group_results, pareto_only: false, io: io)
       script = io.string
       assert_match(/set terminal png/, script)
       assert_match(/#{compressor.name} << EOD/, script)
 
+      # Again, just make sure the Pareto only plot runs.
+      io = StringIO.new
+      raw_plotter.plot(group_results, pareto_only: true, io: io)
+      assert_match(/#{compressor.name} << EOD/, io.string)
+      assert raw_plotter.group_results.size.positive?
+
+      # Make a cost plot.
       cost_model = CostModel.new(
         gibyte_cost: 0.023,
         compression_hour_cost: 0.05,
@@ -186,7 +212,8 @@ class TestCompareCompressors < MiniTest::Test
       summary_results = cost_model.summarize(costed_group_results)
       assert_equal 5, summary_results.size
 
-      plotter = CostPlotter.new(
+      # Run the cost plotter.
+      cost_plotter = CostPlotter.new(
         cost_model,
         terminal: Plotter::DEFAULT_TERMINAL,
         output: Plotter::DEFAULT_OUTPUT,
@@ -199,13 +226,19 @@ class TestCompareCompressors < MiniTest::Test
       )
 
       io = StringIO.new
-      plotter.plot(costed_group_results, io: io)
+      cost_plotter.plot(costed_group_results, pareto_only: false, io: io)
       script = io.string
       assert_match(/set terminal png/, script)
       assert_match(/#{compressor.name} << EOD/, script)
       assert_match(/set lmargin 5/, script)
       assert_match(/set logscale y/, script)
       assert_match(/set autoscale fix/, script)
+
+      # Again, just make sure the Pareto only plot runs.
+      io = StringIO.new
+      cost_plotter.plot(costed_group_results, pareto_only: true, io: io)
+      assert_match(/#{compressor.name} << EOD/, io.string)
+      assert cost_plotter.group_results.size.positive?
     end
   end
 end

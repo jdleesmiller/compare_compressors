@@ -39,6 +39,10 @@ module CompareCompressors
       io.puts 'set ylabel "Size Cost ($)"'
     end
 
+    def column_names
+      [:hour_cost, :gibyte_cost]
+    end
+
     def splots
       splots = []
       splots.concat(contour_splots) if show_cost_contours
@@ -49,7 +53,7 @@ module CompareCompressors
 
     def points_splots
       compressor_names.map do |name|
-        columns = CostedGroupResult.column_indexes(:hour_cost, :gibyte_cost, 0)
+        columns = column_numbers + [0]
         "'$#{name}' using #{columns.join(':')} with points nocontour" \
         " #{point_style(name)}" \
         " title '#{find_display_name(name)}'"
@@ -58,10 +62,7 @@ module CompareCompressors
 
     def point_label_splots
       compressor_names.map do |name|
-        columns = CostedGroupResult.column_indexes(
-          :hour_cost, :gibyte_cost, 0, :compressor_level
-        )
-        "'$#{name}' using #{columns.join(':')} with labels nocontour notitle"
+        columns = column_numbers + [0] + column_numbers([:compressor_level])
       end
     end
 

@@ -55,42 +55,6 @@ module CompareCompressors
       end
     end
 
-    #
-    # Find costed grouped results on the Pareto frontier of the given set of
-    # costed grouped results.
-    #
-    # @param [Array.<GroupResult>] group_results
-    # @return [Array.<GroupResult>]
-    #
-    def self.find_non_dominated(costed_group_results)
-      costed_group_results.reject do |costed_group_result0|
-        costed_group_results.any? do |costed_group_result1|
-          costed_group_result1.dominates?(costed_group_result0)
-        end
-      end
-    end
-
-    #
-    # Dominates on both space and time criteria.
-    #
-    # @param [CostedGroupResult] other
-    #
-    def dominates?(other)
-      hour_cost < other.hour_cost && gibyte_cost < other.gibyte_cost
-    end
-
-    #
-    # Look up the column indices for the given columns by name.
-    #
-    # @param [Array.<[Symbol, Integer]>]
-    # @return [Array.<Integer>]
-    #
-    def self.column_indexes(*column_names)
-      column_names.map do |name|
-        name.is_a?(Integer) ? name : members.index(name) + 1
-      end
-    end
-
     def to_s
       gib_saved = mean_compression_delta_gibytes
       <<-STRING
