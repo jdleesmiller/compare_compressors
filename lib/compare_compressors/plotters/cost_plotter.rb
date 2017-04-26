@@ -22,6 +22,18 @@ module CompareCompressors
     attr_reader :cost_model
     attr_reader :show_cost_contours
 
+    private
+
+    def column_values(column_name)
+      group_results.map(&column_name)
+    end
+
+    def color_palette_range
+      min_cost = column_names.map { |name| column_values(name).min }.inject(&:+)
+      max_cost = column_names.map { |name| column_values(name).max }.inject(&:+)
+      [min_cost / 2.0, max_cost]
+    end
+
     def write_style
       super
 
@@ -30,7 +42,7 @@ module CompareCompressors
       io.puts 'set palette gray'
       io.puts 'set cntrlabel font ",10"'
       io.puts 'set style textbox opaque noborder'
-      io.puts 'set cbrange [0:1]' # TODO: find min and max cost?
+      io.puts "set cbrange [#{color_palette_range.join(':')}]"
       io.puts 'unset colorbox'
     end
 
