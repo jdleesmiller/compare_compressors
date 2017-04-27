@@ -69,13 +69,13 @@ module CompareCompressors
       <<-STRING
 #{compressor_name} level #{compressor_level}:
   compression ratio           : #{format('%.2f', geomean_compression_ratio)}
-  compression elapsed hours   : #{format('%.1f', mean_compression_elapsed_hours)}
-  compression CPU hours       : #{format('%.1f', mean_compression_cpu_hours)}
+  compression elapsed hours   : #{format('%.4f', mean_compression_elapsed_hours)}
+  compression CPU hours       : #{format('%.4f', mean_compression_cpu_hours)}
   compression max RSS (KiB)   : #{format('%d', max_compression_max_rss)}
-  compressed GiB              : #{format('%.1f', mean_compressed_gibytes)}
-  GiB saved                   : #{format('%.1f', gib_saved)}
-  decompression elapsed hours : #{format('%.1f', mean_decompression_elapsed_hours)}
-  decompression CPU hours     : #{format('%.1f', mean_decompression_cpu_hours)}
+  compressed GiB              : #{format('%.2f', mean_compressed_gibytes)}
+  GiB saved                   : #{format('%.2f', gib_saved)}
+  decompression elapsed hours : #{format('%.4f', mean_decompression_elapsed_hours)}
+  decompression CPU hours     : #{format('%.4f', mean_decompression_cpu_hours)}
   decompression max RSS (KiB) : #{format('%d', max_decompression_max_rss)}
   ------------------
   storage cost                : #{format('$%0.02f', gibyte_cost)}
