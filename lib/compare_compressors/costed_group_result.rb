@@ -7,11 +7,13 @@ module CompareCompressors
   CostedGroupResult = Struct.new(
     :compressor_name,
     :compressor_level,
+    :mean_compression_elapsed_hours,
     :mean_compression_cpu_hours,
     :max_compression_max_rss,
     :mean_compressed_gibytes,
     :mean_compression_delta_gibytes,
     :geomean_compression_ratio,
+    :mean_decompression_elapsed_hours,
     :mean_decompression_cpu_hours,
     :max_decompression_max_rss,
     :compression_hour_cost,
@@ -21,12 +23,17 @@ module CompareCompressors
     :total_cost
   ) do
     def self.new_from_group_result(cost_model, group_result)
+      if cost_model.use_cpu_time
+        compression_hours = group_result.mean_compression_cpu_hours
+        decompression_hours = group_result.mean_decompression_cpu_hours
+      else
+        compression_hours = group_result.mean_compression_elapsed_hours
+        decompression_hours = group_result.mean_decompression_elapsed_hours
+      end
       compression_hour_cost =
-        cost_model.compression_hour_cost *
-        group_result.mean_compression_cpu_hours
+        cost_model.compression_hour_cost * compression_hours
       decompression_hour_cost =
-        cost_model.decompression_hour_cost *
-        group_result.mean_decompression_cpu_hours
+        cost_model.decompression_hour_cost * decompression_hours
       hour_cost = compression_hour_cost + decompression_hour_cost
       gibyte_cost =
         cost_model.gibyte_cost *
@@ -35,10 +42,12 @@ module CompareCompressors
         group_result.compressor_name,
         group_result.compressor_level,
         group_result.mean_compression_cpu_hours,
+        group_result.mean_compression_elapsed_hours,
         group_result.max_compression_max_rss,
         group_result.mean_compressed_gibytes,
         group_result.mean_compression_delta_gibytes,
         group_result.geomean_compression_ratio,
+        group_result.mean_decompression_elapsed_hours,
         group_result.mean_decompression_cpu_hours,
         group_result.max_decompression_max_rss,
         compression_hour_cost,
@@ -60,10 +69,12 @@ module CompareCompressors
       <<-STRING
 #{compressor_name} level #{compressor_level}:
   compression ratio           : #{format('%.2f', geomean_compression_ratio)}
+  compression elapsed hours   : #{format('%.1f', mean_compression_elapsed_hours)}
   compression CPU hours       : #{format('%.1f', mean_compression_cpu_hours)}
   compression max RSS (KiB)   : #{format('%d', max_compression_max_rss)}
   compressed GiB              : #{format('%.1f', mean_compressed_gibytes)}
   GiB saved                   : #{format('%.1f', gib_saved)}
+  decompression elapsed hours : #{format('%.1f', mean_decompression_elapsed_hours)}
   decompression CPU hours     : #{format('%.1f', mean_decompression_cpu_hours)}
   decompression max RSS (KiB) : #{format('%d', max_decompression_max_rss)}
   ------------------

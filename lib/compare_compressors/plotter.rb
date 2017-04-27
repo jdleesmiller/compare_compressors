@@ -12,10 +12,11 @@ module CompareCompressors
     DEFAULT_SHOW_LABELS = true
     DEFAULT_LMARGIN = nil
     DEFAULT_TITLE = nil
+    DEFAULT_USE_CPU_TIME = false
 
     def initialize(
       terminal:, output:, logscale_size:, autoscale_fix:,
-      show_labels:, lmargin:, title:
+      show_labels:, lmargin:, title:, use_cpu_time:
     )
       @terminal = terminal
       @output = output
@@ -24,6 +25,7 @@ module CompareCompressors
       @show_labels = show_labels
       @lmargin = lmargin
       @title = title
+      @use_cpu_time = use_cpu_time
 
       @group_results = nil
       @io = nil
@@ -36,6 +38,7 @@ module CompareCompressors
     attr_reader :show_labels
     attr_reader :lmargin
     attr_reader :title
+    attr_reader :use_cpu_time
 
     attr_reader :group_results
     attr_reader :io
@@ -96,6 +99,14 @@ module CompareCompressors
 
     def write_plots
       io.puts "splot #{splots.join(", \\\n  ")}"
+    end
+
+    def time_unit
+      if use_cpu_time
+        '(CPU Hours)'
+      else
+        '(Hours)'
+      end
     end
 
     def compressor_names

@@ -11,19 +11,25 @@ module CompareCompressors
     # Default to on-demand cost for an Amazon EC2 m3.medium ($).
     DEFAULT_HOUR_COST = 0.073
 
+    # Default to elapsed time rather than CPU time
+    DEFAULT_USE_CPU_TIME = false
+
     def initialize(
       gibyte_cost: DEFAULT_GIBYTE_COST,
       compression_hour_cost: DEFAULT_HOUR_COST,
-      decompression_hour_cost: DEFAULT_HOUR_COST
+      decompression_hour_cost: DEFAULT_HOUR_COST,
+      use_cpu_time: DEFAULT_USE_CPU_TIME
     )
       @gibyte_cost = gibyte_cost
       @compression_hour_cost = compression_hour_cost
       @decompression_hour_cost = decompression_hour_cost
+      @use_cpu_time = use_cpu_time
     end
 
     attr_reader :gibyte_cost
     attr_reader :compression_hour_cost
     attr_reader :decompression_hour_cost
+    attr_reader :use_cpu_time
 
     def cost(grouped_results)
       grouped_results.map do |group_result|

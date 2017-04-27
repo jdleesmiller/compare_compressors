@@ -37,6 +37,14 @@ module CompareCompressors
           default: 1.0
       end
 
+      def use_cpu_time_option
+        option \
+          :use_cpu_time,
+          type: :boolean,
+          desc: 'use CPU time rather than elapsed time',
+          default: CostModel::DEFAULT_USE_CPU_TIME
+      end
+
       def cost_options
         option \
           :gibyte_cost,
@@ -101,6 +109,7 @@ module CompareCompressors
       'plot [csv file]',
       'Write a gnuplot script for a basic 2D plot with the CSV from compare'
     scale_option
+    use_cpu_time_option
     plot_options
     option \
       :decompression,
@@ -121,6 +130,7 @@ module CompareCompressors
       'plot_3d [csv file]',
       'Write a gnuplot script for a 3D plot with the CSV from compare'
     scale_option
+    use_cpu_time_option
     plot_options
     def plot_3d(csv_file = nil)
       results = read_results(csv_file)
@@ -133,6 +143,7 @@ module CompareCompressors
       'plot_costs [csv file]',
       'Write a gnuplot script for a 2D cost plot with the CSV from compare'
     scale_option
+    use_cpu_time_option
     cost_options
     plot_options
     option \
@@ -157,6 +168,7 @@ module CompareCompressors
       'summarize [csv file]',
       'Read CSV from compare and write out a summary'
     scale_option
+    use_cpu_time_option
     cost_options
     def summarize(csv_file = nil)
       results = read_results(csv_file)
@@ -173,7 +185,8 @@ module CompareCompressors
       CostModel.new(
         gibyte_cost: options[:gibyte_cost],
         compression_hour_cost: options[:compression_hour_cost],
-        decompression_hour_cost: options[:decompression_hour_cost]
+        decompression_hour_cost: options[:decompression_hour_cost],
+        use_cpu_time: options[:use_cpu_time]
       )
     end
 
@@ -187,6 +200,7 @@ module CompareCompressors
         show_labels: options[:show_labels],
         lmargin: options[:lmargin],
         title: options[:title],
+        use_cpu_time: options[:use_cpu_time],
         **kwargs
       )
     end

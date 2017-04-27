@@ -23,18 +23,26 @@ module CompareCompressors
     def write_labels
       io.puts 'set ylabel "Compressed Size (GiB)"'
       if decompression
-        io.puts 'set xlabel "Decompression Time (CPU hours)"'
+        io.puts "set xlabel 'Decompression Time #{time_unit}'"
       else
-        io.puts 'set xlabel "Compression Time (CPU hours)"'
+        io.puts "set xlabel 'Compression Time #{time_unit}'"
+      end
+    end
+
+    def time_column_name
+      if decompression && use_cpu_time
+        :mean_decompression_cpu_hours
+      elsif decompression
+        :mean_decompression_elapsed_hours
+      elsif use_cpu_time
+        :mean_compression_cpu_hours
+      else
+        :mean_compression_elapsed_hours
       end
     end
 
     def column_names
-      if decompression
-        [:mean_decompression_cpu_hours, :mean_compressed_gibytes]
-      else
-        [:mean_compression_cpu_hours, :mean_compressed_gibytes]
-      end
+      [time_column_name, :mean_compressed_gibytes]
     end
 
     def write_plots

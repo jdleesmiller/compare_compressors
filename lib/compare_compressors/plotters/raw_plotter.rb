@@ -25,17 +25,25 @@ module CompareCompressors
     end
 
     def write_labels
-      io.puts 'set xlabel "Compression Time (CPU hours)" rotate parallel'
+      io.puts "set xlabel 'Compression Time #{time_unit}' rotate parallel"
       io.puts 'set ylabel "Compressed Size (GiB)" rotate parallel'
-      io.puts 'set zlabel "Decompression Time (CPU hours)" rotate parallel'
+      io.puts "set zlabel 'Decompression Time #{time_unit}' rotate parallel"
     end
 
     def column_names
-      [
-        :mean_compression_cpu_hours,
-        :mean_compressed_gibytes,
-        :mean_decompression_cpu_hours
-      ]
+      if use_cpu_time
+        [
+          :mean_compression_cpu_hours,
+          :mean_compressed_gibytes,
+          :mean_decompression_cpu_hours
+        ]
+      else
+        [
+          :mean_compression_elapsed_hours,
+          :mean_compressed_gibytes,
+          :mean_decompression_elapsed_hours
+        ]
+      end
     end
 
     def splots

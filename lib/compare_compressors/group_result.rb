@@ -7,11 +7,13 @@ module CompareCompressors
   GroupResult = Struct.new(
     :compressor_name,
     :compressor_level,
+    :mean_compression_elapsed_hours,
     :mean_compression_cpu_hours,
     :max_compression_max_rss,
     :mean_compressed_gibytes,
     :mean_compression_delta_gibytes,
     :geomean_compression_ratio,
+    :mean_decompression_elapsed_hours,
     :mean_decompression_cpu_hours,
     :max_decompression_max_rss
   ) do
@@ -28,11 +30,13 @@ module CompareCompressors
       new(
         compressor_name,
         compressor_level,
+        scale * Result.mean(results, :compression_elapsed_time) / HOUR,
         scale * Result.mean(results, :compression_cpu_time) / HOUR,
         results.map(&:compression_max_rss).max,
         scale * Result.mean(results, :size) / GIGABYTE,
         scale * Result.mean(results, :compression_delta) / GIGABYTE,
         Result.geomean(results, :compression_ratio),
+        scale * Result.mean(results, :decompression_elapsed_time) / HOUR,
         scale * Result.mean(results, :decompression_cpu_time) / HOUR,
         results.map(&:decompression_max_rss).max
       )

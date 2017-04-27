@@ -32,6 +32,9 @@ class TestCompareCompressors < MiniTest::Test
       assert_equal 'fooz', group_results[0].compressor_name
       assert_equal 1, group_results[0].compressor_level
       assert_in_delta \
+        10_000 * (1.1 + 1.3) / 2 / 3600,
+        group_results[0].mean_compression_elapsed_hours
+      assert_in_delta \
         10_000 * (10.1 + 10.3) / 2 / 3600,
         group_results[0].mean_compression_cpu_hours
       assert_equal 1002, group_results[0].max_compression_max_rss
@@ -45,17 +48,21 @@ class TestCompareCompressors < MiniTest::Test
         Math.sqrt((10_000.0 / 5000) * (10_000.0 / 4000)),
         group_results[0].geomean_compression_ratio
       assert_in_delta \
+        10_000 * (3.1 + 3.3) / 2 / 3600,
+        group_results[0].mean_decompression_elapsed_hours
+      assert_in_delta \
         10_000 * (2.1 + 2.3) / 2 / 3600,
         group_results[0].mean_decompression_cpu_hours
       assert_equal 2002, group_results[0].max_decompression_max_rss
 
-      cost_model = CostModel.new(
+      cpu_time_cost_model = CostModel.new(
         gibyte_cost: 0.023,
         compression_hour_cost: 0.05,
-        decompression_hour_cost: 0.10
+        decompression_hour_cost: 0.10,
+        use_cpu_time: true
       )
       costed_group_results =
-        CostedGroupResult.from_group_results(cost_model, group_results)
+        CostedGroupResult.from_group_results(cpu_time_cost_model, group_results)
 
       assert_equal 2, costed_group_results.size
       assert_equal 'fooz', costed_group_results[0].compressor_name
@@ -73,6 +80,22 @@ class TestCompareCompressors < MiniTest::Test
         costed_group_results[0].total_cost,
         costed_group_results[0].hour_cost +
         costed_group_results[0].gibyte_cost
+
+      elapsed_time_cost_model = CostModel.new(
+        gibyte_cost: 0.023,
+        compression_hour_cost: 0.05,
+        decompression_hour_cost: 0.10,
+        use_cpu_time: false
+      )
+      costed_group_results = CostedGroupResult.from_group_results(
+        elapsed_time_cost_model, group_results
+      )
+      assert_in_delta \
+        0.05 * group_results[0].mean_compression_elapsed_hours,
+        costed_group_results[0].compression_hour_cost
+      assert_in_delta \
+        0.10 * group_results[0].mean_decompression_elapsed_hours,
+        costed_group_results[0].decompression_hour_cost
     end
   end
 
@@ -161,7 +184,8 @@ class TestCompareCompressors < MiniTest::Test
         autoscale_fix: true,
         show_labels: true,
         lmargin: 5,
-        title: 'Test Plot'
+        title: 'Test Plot',
+        use_cpu_time: true
       )
       io = StringIO.new
       size_plotter.plot(group_results, pareto_only: false, io: io)
@@ -184,7 +208,8 @@ class TestCompareCompressors < MiniTest::Test
         autoscale_fix: true,
         show_labels: true,
         lmargin: 5,
-        title: 'Test Plot'
+        title: 'Test Plot',
+        use_cpu_time: false
       )
       io = StringIO.new
       raw_plotter.plot(group_results, pareto_only: false, io: io)
@@ -202,7 +227,8 @@ class TestCompareCompressors < MiniTest::Test
       cost_model = CostModel.new(
         gibyte_cost: 0.023,
         compression_hour_cost: 0.05,
-        decompression_hour_cost: 0.10
+        decompression_hour_cost: 0.10,
+        use_cpu_time: false
       )
 
       costed_group_results =
@@ -222,7 +248,8 @@ class TestCompareCompressors < MiniTest::Test
         show_cost_contours: true,
         show_labels: true,
         lmargin: 5,
-        title: 'Test Plot'
+        title: 'Test Plot',
+        use_cpu_time: false
       )
 
       io = StringIO.new
