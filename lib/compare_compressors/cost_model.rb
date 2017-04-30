@@ -17,6 +17,9 @@ module CompareCompressors
     # Default to dollars.
     DEFAULT_CURRENCY = '$'
 
+    # Default to dollars.
+    DEFAULT_SUMMARIZE_TOP = 5
+
     def initialize(
       gibyte_cost: DEFAULT_GIBYTE_COST,
       compression_hour_cost: DEFAULT_HOUR_COST,
@@ -43,7 +46,7 @@ module CompareCompressors
       end
     end
 
-    def summarize(costed_grouped_results, top = 5)
+    def summarize(costed_grouped_results, top = DEFAULT_SUMMARIZE_TOP)
       costed_grouped_results.sort_by(&:total_cost).take(top).map do |result|
         result.to_s(currency)
       end

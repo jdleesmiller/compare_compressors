@@ -175,13 +175,18 @@ module CompareCompressors
     scale_option
     use_cpu_time_option
     cost_options
+    option \
+      :top,
+      desc: 'number of results to include',
+      type: :numeric,
+      default: CostModel::DEFAULT_SUMMARIZE_TOP
     def summarize(csv_file = nil)
       results = read_results(csv_file)
       group_results = GroupResult.group(results, scale: options[:scale])
       cost_model = make_cost_model(options)
       costed_group_results =
         CostedGroupResult.from_group_results(cost_model, group_results)
-      puts cost_model.summarize(costed_group_results)
+      puts cost_model.summarize(costed_group_results, options[:top])
     end
 
     private
