@@ -47,8 +47,8 @@ module CompareCompressors
     end
 
     def write_labels
-      io.puts 'set xlabel "Time Cost ($)"'
-      io.puts 'set ylabel "Size Cost ($)"'
+      io.puts "set xlabel 'Time Cost (#{cost_model.currency})'"
+      io.puts "set ylabel 'Size Cost (#{cost_model.currency})'"
     end
 
     def column_names

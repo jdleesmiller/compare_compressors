@@ -61,6 +61,11 @@ module CompareCompressors
           type: :numeric,
           desc: 'compute cost per hour of CPU time for decompression',
           default: CostModel::DEFAULT_HOUR_COST
+        option \
+          :currency,
+          type: :string,
+          desc: 'currency symbol for display',
+          default: CostModel::DEFAULT_CURRENCY
       end
 
       def plot_options
@@ -186,7 +191,8 @@ module CompareCompressors
         gibyte_cost: options[:gibyte_cost],
         compression_hour_cost: options[:compression_hour_cost],
         decompression_hour_cost: options[:decompression_hour_cost],
-        use_cpu_time: options[:use_cpu_time]
+        use_cpu_time: options[:use_cpu_time],
+        currency: options[:currency]
       )
     end
 
