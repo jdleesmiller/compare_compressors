@@ -8,7 +8,7 @@ https://github.com/jdleesmiller/compare_compressors
 
 Evaluate different compression tools and their settings by running them on a sample of data.
 
-See [this blog post for an example of how to use the tool](TODO).
+See [this blog post for an example of how to use the tool](http://jdlm.info/articles/2017/05/01/compression-pareto-docker-gnuplot.html).
 
 ### Usage
 
@@ -103,7 +103,7 @@ The only caveat is that you need to preserve the `.bundle` folder inside the con
 
 ## Related
 
-- See [this blog post for an example of how to use the tool](TODO).
+- See [this blog post for an example of how to use the tool](http://jdlm.info/articles/2017/05/01/compression-pareto-docker-gnuplot.html).
 - For many more compression algorithms, see https://quixdb.github.io/squash-benchmark/
 
 ## License
