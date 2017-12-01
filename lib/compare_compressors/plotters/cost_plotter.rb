@@ -52,7 +52,7 @@ module CompareCompressors
     end
 
     def column_names
-      [:hour_cost, :gibyte_cost]
+      %i[hour_cost gibyte_cost]
     end
 
     def splots

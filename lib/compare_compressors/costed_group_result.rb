@@ -66,21 +66,21 @@ module CompareCompressors
 
     def to_s(currency = CostModel::DEFAULT_CURRENCY)
       gib_saved = mean_compression_delta_gibytes
-      <<-STRING
-#{compressor_name} level #{compressor_level}:
-  compression ratio           : #{format('%.2f', geomean_compression_ratio)}
-  compression elapsed hours   : #{format('%.4f', mean_compression_elapsed_hours)}
-  compression CPU hours       : #{format('%.4f', mean_compression_cpu_hours)}
-  compression max RSS (KiB)   : #{format('%d', max_compression_max_rss)}
-  compressed GiB              : #{format('%.4f', mean_compressed_gibytes)}
-  GiB saved                   : #{format('%.2f', gib_saved)}
-  decompression elapsed hours : #{format('%.4f', mean_decompression_elapsed_hours)}
-  decompression CPU hours     : #{format('%.4f', mean_decompression_cpu_hours)}
-  decompression max RSS (KiB) : #{format('%d', max_decompression_max_rss)}
-  ------------------
-  storage cost                : #{format('%s%0.02f', currency, gibyte_cost)}
-  compute cost                : #{format('%s%0.02f', currency, hour_cost)}
-  total cost                  : #{format('%s%0.02f', currency, total_cost)}
+      <<~STRING
+        #{compressor_name} level #{compressor_level}:
+          compression ratio           : #{format('%.2f', geomean_compression_ratio)}
+          compression elapsed hours   : #{format('%.4f', mean_compression_elapsed_hours)}
+          compression CPU hours       : #{format('%.4f', mean_compression_cpu_hours)}
+          compression max RSS (KiB)   : #{format('%d', max_compression_max_rss)}
+          compressed GiB              : #{format('%.4f', mean_compressed_gibytes)}
+          GiB saved                   : #{format('%.2f', gib_saved)}
+          decompression elapsed hours : #{format('%.4f', mean_decompression_elapsed_hours)}
+          decompression CPU hours     : #{format('%.4f', mean_decompression_cpu_hours)}
+          decompression max RSS (KiB) : #{format('%d', max_decompression_max_rss)}
+          ------------------
+          storage cost                : #{format('%s%0.02f', currency, gibyte_cost)}
+          compute cost                : #{format('%s%0.02f', currency, hour_cost)}
+          total cost                  : #{format('%s%0.02f', currency, total_cost)}
       STRING
     end
   end

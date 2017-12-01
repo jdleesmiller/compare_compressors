@@ -17,7 +17,7 @@ module CompareCompressors
         puts format('%10s: %s', compressor.name, compressor.version || '?')
       end
     end
-    map %w(--version -v) => :version
+    map %w[--version -v] => :version
 
     desc \
       'compare <target files>',

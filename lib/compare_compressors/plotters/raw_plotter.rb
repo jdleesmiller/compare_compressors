@@ -32,16 +32,16 @@ module CompareCompressors
 
     def column_names
       if use_cpu_time
-        [
-          :mean_compression_cpu_hours,
-          :mean_compressed_gibytes,
-          :mean_decompression_cpu_hours
+        %i[
+          mean_compression_cpu_hours
+          mean_compressed_gibytes
+          mean_decompression_cpu_hours
         ]
       else
-        [
-          :mean_compression_elapsed_hours,
-          :mean_compressed_gibytes,
-          :mean_decompression_elapsed_hours
+        %i[
+          mean_compression_elapsed_hours
+          mean_compressed_gibytes
+          mean_decompression_elapsed_hours
         ]
       end
     end
