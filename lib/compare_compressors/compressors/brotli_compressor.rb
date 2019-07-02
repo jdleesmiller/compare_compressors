@@ -25,9 +25,9 @@ module CompareCompressors
     def compression_command(target, level)
       [
         'brotli',
-        '--input', target,
-        '--output', output_name(target),
-        '--quality', level.to_s
+        '-o', output_name(target), # output
+        '-q', level.to_s, # quality
+        target
       ]
     end
 
@@ -35,8 +35,8 @@ module CompareCompressors
       [
         'brotli',
         '--decompress',
-        '--input', output_name(target),
-        '--output', target
+        '-o', target, # output
+        output_name(target)
       ]
     end
   end
